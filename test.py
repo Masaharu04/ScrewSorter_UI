@@ -1,15 +1,18 @@
-# ボタンフレームの設定
-button_frame = ctk.CTkFrame(self.master, corner_radius=15)
-button_frame.pack(padx=20, pady=20, fill="both")
+    # 各セクションを作成
+    self.create_section(main_frame, "投入", "運転", "停止", "green", "red")
+    self.create_section(main_frame, "判別", "運転", "停止", "green", "red")
+    self.create_section(main_frame, "整列", "運転", "停止", "green", "red")
+    self.create_section(main_frame, "返却", "運転", "停止", "green", "red")
 
-# フレームのグリッドの行と列に重みを与えて中央配置を行う
-button_frame.grid_columnconfigure(0, weight=1)
-button_frame.grid_columnconfigure(1, weight=1)
-button_frame.grid_columnconfigure(2, weight=1)
-button_frame.grid_rowconfigure(0, weight=1)
-button_frame.grid_rowconfigure(1, weight=1)
+def create_section(self, parent, title, start_text, stop_text, start_color, stop_color):
+    section_frame = ctk.CTkFrame(parent)
+    section_frame.pack(pady=10, padx=10, fill="x")  # フレームは横に広がるようにする
 
-# ボタンの配置（行列レイアウトとサイズ調整）
-for i, (text, color, command) in enumerate(buttons):
-    button = ctk.CTkButton(button_frame, text=text, width=300, height=200, corner_radius=15, fg_color=color, command=command)
-    button.grid(row=i // 3, column=i % 3, padx=40, pady=40)  # 大きめのパディングを設定
+    title_label = ctk.CTkLabel(section_frame, text=title, font=("Arial", 18))
+    title_label.grid(row=0, column=0, columnspan=2, pady=(0, 10))  # タイトルは全体の上に配置
+
+    start_button = ctk.CTkButton(section_frame, text=start_text, command=lambda: self.start_process(title), fg_color=start_color)
+    start_button.grid(row=1, column=0, padx=(0, 10))  # ボタンを1行目の左に配置
+
+    stop_button = ctk.CTkButton(section_frame, text=stop_text, command=lambda: self.stop_process(title), fg_color=stop_color)
+    stop_button.grid(row=1, column=1)  # ボタンを1行目の右に配置
