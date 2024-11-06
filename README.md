@@ -53,7 +53,7 @@ Linux
 ```
 source myenv/bin/activate
 ```
-Windowas
+Windows
 ```
 myenv\Scripts\activate
 ```
