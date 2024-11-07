@@ -3,12 +3,14 @@ from PIL import Image
 import threading
 import time
 from src.ui.export.export import export_button_action
+from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
 
 class UnderButtonFrame:
     def __init__(self, master, main_view):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
+        self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
 
     def setup_buttons(self):
@@ -31,7 +33,7 @@ class UnderButtonFrame:
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", lambda: self.main_view.display_message("排出ボタンが押されました"), True)),
             ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
             ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.main_view.open_maintenance_view, False)),
-            ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", lambda: self.main_view.display_message("シャットダウンボタンが押されました"), True))
+            ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
         ]
 
         # 各ボタンの初期状態を有効に設定
@@ -106,3 +108,7 @@ class UnderButtonFrame:
             self.button_frame.grid_columnconfigure(i, weight=1)
         for i in range(2):
             self.button_frame.grid_rowconfigure(i, weight=1)
+
+    def open_shutdown_confirmation(self):
+        # シャットダウン確認ポップアップを表示
+        self.shutdown_popup.shutdown_button_action()  # インスタンスメソッドを呼び出す
