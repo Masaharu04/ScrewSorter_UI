@@ -123,9 +123,11 @@ class MainView:
         self.master.deiconify()
 
     def open_maintenance_view(self):
-        self.master.withdraw()
+        # メンテナンス画面を開く前に、元のウィンドウを隠す
         maintenance_window = ctk.CTkToplevel(self.master)
         MaintenanceView(maintenance_window, self.on_maintenance_close)
+        self.master.withdraw()  # メンテナンス画面が開いた後に、元のウィンドウを隠す
+        maintenance_window.protocol("WM_DELETE_WINDOW", self.on_maintenance_close)
 
     def on_maintenance_close(self):
         self.master.deiconify()
