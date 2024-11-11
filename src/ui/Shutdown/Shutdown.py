@@ -3,7 +3,7 @@ import customtkinter as ctk
 class ShutdownPopup:
     def __init__(self, master):
         self.master = master
-        self.is_showing = False  # ポップアップ表示状態を管理する変数を追加
+        self.is_showing = False 
 
     def shutdown_button_action(self):
         # シャットダウン確認ポップアップを表示
@@ -41,9 +41,8 @@ class ShutdownPopup:
     def shutdown_action(self):
         print("シャットダウン処理を実行します")
         # ここに実際のシャットダウン処理を追加
-        # 例: os.system("shutdown /s /t 1")  # Windowsの場合
-        # 例: os.system("shutdown now")  # Linuxの場合
+     
        
     def close_popup(self, overlay):
-        self.is_showing = False  # ポップアップ表示状態をFalseに設定
-        overlay.destroy()  # ポップアップを閉じる
+        self.is_showing = False  
+        overlay.destroy()  

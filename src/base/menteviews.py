@@ -6,6 +6,9 @@ class MaintenanceView:
         self.on_close = on_close
         self.setup_ui()
 
+        # カーソルを非表示にする
+        self.master.config(cursor="")
+
     def setup_ui(self):
         # UIの各要素を順番にセットアップ
         self._setup_window()
