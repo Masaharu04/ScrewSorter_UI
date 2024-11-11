@@ -16,6 +16,9 @@ class MainView:
         self.setup_ui()
         self.start_error_monitoring()
 
+        # カーソルを非表示にする
+        self.master.config(cursor="")
+
     def setup_ui(self):
         self.master.geometry('800x480')
         self.master.title("メイン画面")
@@ -138,6 +141,11 @@ class MainView:
         if error_code:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
+
+    def update_stocker_labels(self, selected_values):
+        # 選択されたストッカーを表示する処理を追加
+        print(f"表示するストッカー: {selected_values}")
+        # ここでUIに反映させる処理を追加することができます
 
 
 

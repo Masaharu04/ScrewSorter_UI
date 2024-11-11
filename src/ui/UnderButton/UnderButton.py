@@ -4,6 +4,7 @@ import threading
 import time
 from src.ui.export.export import export_button_action
 from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
+from src.base.settingviews import MaintenanceView  # MaintenanceViewをインポート
 
 class UnderButtonFrame:
     def __init__(self, master, main_view):
@@ -28,7 +29,7 @@ class UnderButtonFrame:
 
         # ボタン設定
         self.buttons = [
-            ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.main_view.show_warning, False)),
+            ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
             ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", lambda: self.main_view.display_message("一連動作ボタンが押されました"), True)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", lambda: self.main_view.display_message("排出ボタンが押されました"), True)),
             ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
@@ -41,6 +42,15 @@ class UnderButtonFrame:
             self.button_enabled[button_name] = True
 
         self.create_buttons()
+
+    def open_setting_view(self):
+        # 設定画面を開く
+        setting_window = ctk.CTkToplevel(self.master)
+        MaintenanceView(setting_window, self.on_setting_close)  # MaintenanceViewを開く
+        self.master.withdraw()  # 元のウィンドウを隠す
+
+    def on_setting_close(self):
+        self.master.deiconify()  # 元のウィンドウを再表示
 
     def handle_button_click(self, button_name, command, use_timer):
         if self.button_enabled[button_name]:
@@ -83,6 +93,7 @@ class UnderButtonFrame:
                 image=button_image,
                 text="",
                 fg_color=color,
+                hover_color=None,  # ホバー時の色を無効にする
                 width=40,
                 height=40,
                 corner_radius=10
