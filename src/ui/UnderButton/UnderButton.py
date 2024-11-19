@@ -3,12 +3,15 @@ from PIL import Image
 import threading
 import time
 from src.ui.export.export import export_button_action
+from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
+from src.base.settingviews import MaintenanceView  # MaintenanceViewをインポート
 
 class UnderButtonFrame:
     def __init__(self, master, main_view):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
+        self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
 
     def setup_buttons(self):
@@ -26,12 +29,12 @@ class UnderButtonFrame:
 
         # ボタン設定
         self.buttons = [
-            ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.main_view.show_warning, False)),
+            ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
             ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", lambda: self.main_view.display_message("一連動作ボタンが押されました"), True)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", lambda: self.main_view.display_message("排出ボタンが押されました"), True)),
             ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
             ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.main_view.open_maintenance_view, False)),
-            ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", lambda: self.main_view.display_message("シャットダウンボタンが押されました"), True))
+            ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
         ]
 
         # 各ボタンの初期状態を有効に設定
@@ -39,6 +42,16 @@ class UnderButtonFrame:
             self.button_enabled[button_name] = True
 
         self.create_buttons()
+
+    def open_setting_view(self):
+        # 設定画面を開く
+        setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
+        MaintenanceView(setting_window, self.on_setting_close)  # MaintenanceViewを開く
+
+    def on_setting_close(self, selected_values):
+        # 選択されたストッカーを受け取る
+        print(f"選択されたストッカー: {selected_values}")
+        self.master.deiconify()  # 元のウィンドウを再表示
 
     def handle_button_click(self, button_name, command, use_timer):
         if self.button_enabled[button_name]:
@@ -76,11 +89,12 @@ class UnderButtonFrame:
                 button_image = self.poweroff_image
             
             # 画像ボタン
-            image_button = ctk.CTkButton(
+            image_button = ctk.CTkLabel(
                 center_frame, 
                 image=button_image,
                 text="",
                 fg_color=color,
+               # hover_color=None,  # ホバー時の色を無効にする
                 width=40,
                 height=40,
                 corner_radius=10
@@ -106,3 +120,7 @@ class UnderButtonFrame:
             self.button_frame.grid_columnconfigure(i, weight=1)
         for i in range(2):
             self.button_frame.grid_rowconfigure(i, weight=1)
+
+    def open_shutdown_confirmation(self):
+        # シャットダウン確認ポップアップを表示
+        self.shutdown_popup.shutdown_button_action()  # インスタンスメソッドを呼び出す
