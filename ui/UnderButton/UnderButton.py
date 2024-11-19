@@ -47,7 +47,7 @@ class UnderButtonFrame:
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
         MaintenanceView(setting_window, self.on_setting_close)  # MaintenanceViewを開く
-        self.master.withdraw()  # 元のウィンドウを隠す
+        #self.master.withdraw()  # 元のウィンドウを隠す
 
     def on_setting_close(self, selected_values):
         # 選択されたストッカーを受け取る

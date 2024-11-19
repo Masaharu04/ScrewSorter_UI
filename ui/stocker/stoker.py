@@ -7,12 +7,13 @@ def create_stocker_frame(parent):
 
     stocker_grid = ctk.CTkFrame(stocker_frame, fg_color="#2b2b2b")
     stocker_grid.pack(expand=True, fill="both")
-    stocker_values = [0, 0.3, 0.6, 0.9]  # 各ストッカーの値を設定
-    stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)", "その他"]
+    stocker_values = [0, 0.3, 0.6]  # 各ストッカーの値を設定
+    stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]
     color = "#3b8ed0"  # 単色の設定
 
     for i, (text, value) in enumerate(zip(stocker_labels, stocker_values)):
         circle_frame = ctk.CTkFrame(stocker_grid, fg_color="#2b2b2b")
+
         circle_frame.grid(row=0, column=i, padx=5, pady=0)
 
         canvas = ctk.CTkCanvas(circle_frame, width=120, height=120, bg="#2b2b2b", highlightthickness=0)
@@ -46,5 +47,5 @@ def create_stocker_frame(parent):
         label = ctk.CTkLabel(stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
         label.grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
 
-    for i in range(4):
+    for i in range(3):
         stocker_grid.grid_columnconfigure(i, weight=1)
