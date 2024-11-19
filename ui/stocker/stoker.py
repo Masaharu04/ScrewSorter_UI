@@ -1,4 +1,6 @@
 import customtkinter as ctk
+from ParamManager.ParamManager import ParamManager  # ParamManagerをインポート
+
 def create_stocker_frame(parent):
     stocker_frame = ctk.CTkFrame(parent, fg_color="#2b2b2b")
     stocker_frame.pack(side="right", expand=True, fill="both", padx=(0, 0), pady=(10, 0))
@@ -7,7 +9,9 @@ def create_stocker_frame(parent):
 
     stocker_grid = ctk.CTkFrame(stocker_frame, fg_color="#2b2b2b")
     stocker_grid.pack(expand=True, fill="both")
-    stocker_values = [0, 0.3, 0.6]  # 各ストッカーの値を設定
+
+    param_manager = ParamManager()  # ParamManagerのインスタンスを作成
+    stocker_values = param_manager.get_stocker_values()  # ストッカーの値を取得
     stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]
     color = "#3b8ed0"  # 単色の設定
 

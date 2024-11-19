@@ -76,3 +76,6 @@ class MaintenanceView:
 
     def close_maintenance_view(self):
         self.master.destroy() 
+        print(self.selected_values)
+        return self.selected_values
+    
