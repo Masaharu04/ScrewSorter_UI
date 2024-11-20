@@ -4,6 +4,8 @@
 ```
 components/
 ├── src/
+│   ├── ParamManager/
+│   │   └── ParamManager.py 
 │   ├── base/
 │   │   ├── menteviews.py メンテナンス画面
 │   │   ├── settingviews.py　設定画面
