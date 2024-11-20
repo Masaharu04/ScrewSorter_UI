@@ -4,27 +4,23 @@
 ```
 components/
 ├── src/
-│   ├── pycache/
 │   ├── base/
-│   │   ├── menteviews.py
-│   │   ├── settingviews.py
-│   │   └── views.py
-│   └── img/
+│   │   ├── menteviews.py メンテナンス画面
+│   │   ├── settingviews.py　設定画面
+│   │   └── views.py　メイン画面
+│   └── img/　ボタンアイコン画像フォルダー
 ├── ui/
 │   ├── EarPop/
-│   │   ├── _pycache_/
-│   │   └── EarPopup.py
+│   │   └── EarPopup.py　エラーポップの処理
 │   ├── export/
-│   │   ├── _pycache_/
-│   │   └── export.py
+│   │   └── export.py　出力ボタンの処理
 │   ├── InputAmount/
-│   │   └── InputAmount.py
+│   │   └── InputAmount.py　投入量の処理
 │   ├── Shutdown/
-│   │   └── Shutdown.py
+│   │   └── Shutdown.py　シャットダウンボタンを押した際の処理
 │   └── UnderButton/
-│       ├── _pycache_/
-│       └── UnderButton.py
-├── main.py
+│       └── UnderButton.py　メイン画面の下部の処理
+├── main.py　
 ├── viewmodels.py
 └── test.py
 ```
