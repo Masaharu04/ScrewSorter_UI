@@ -1,3 +1,5 @@
+from ParamManager.ParamManager import ParamManager  # ParamManagerをインポート
+
 class MainViewModel:
     def __init__(self):
         self.output_text = ""

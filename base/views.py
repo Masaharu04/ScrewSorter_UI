@@ -53,7 +53,7 @@ class MainView:
         input_amount_frame = InputAmountFrame(left_frame)  # InputAmountFrameを使用
 
         # 中間ストッカーの残量表示フレーム
-        create_stocker_frame(top_frame)  # 変更
+        create_stocker_frame(top_frame, self.viewmodel.param_manager)  # masterを渡す
 
         # 下部フレーム（ボタン）
         self.under_button = UnderButtonFrame(main_frame, self)

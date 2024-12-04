@@ -8,7 +8,8 @@ class InputAmountFrame(ctk.CTkFrame):
         super().__init__(master, fg_color="#3A3A3A")
         self.pack(anchor="center", padx=10, pady=0)
 
-        self.param_manager = ParamManager()  # ParamManagerのインスタンスを作成
+        self.master = master
+        self.param_manager = ParamManager(master)  # masterを渡す
         self.amount_label = ctk.CTkLabel(self, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
         self.amount_label.pack(anchor="center", padx=35, pady=(15, 0))
 

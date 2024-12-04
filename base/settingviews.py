@@ -67,12 +67,20 @@ class MaintenanceView:
         # 選択されたストッカーを表示
         self.selected_values = [label.get() for label in self.selected_labels]  # 選択された値を保存
         
+        # 選択されたストッカーのインデックスを取得
+        index_mapping = {
+            "ボルトM4(5mm)": 1,
+            "ボルトM4(6mm)": 2,
+            "ボルトM4(8mm)": 3
+        }
+        output_values = [index_mapping[value] for value in self.selected_values if value in index_mapping]
+
         # 同じ項目が選ばれているかチェック
         if len(self.selected_values) != len(set(self.selected_values)):
             self.error_popup.show_error("E001")  # エラーコードを指定してポップアップを表示
             return
         
-        print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
+        print(output_values)  # 保存した値を表示
 
     def close_maintenance_view(self):
         self.master.destroy() 
