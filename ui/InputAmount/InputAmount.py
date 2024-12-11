@@ -17,13 +17,14 @@ class InputAmountFrame(ctk.CTkFrame):
 
         # 初期表示の更新
         self.update_input_amount()  # 初期値を表示
-        threading.Thread(target=self.run_update, daemon=True).start()  # スレッドを開始
+       # threading.Thread(target=self.run_update, daemon=True).start()  # スレッドを開始
 
     def update_input_amount(self):
-        input_amount = self.param_manager.get_input_amount()  # 投入量を取得
+        #input_amount = self.param_manager.get_input_amount()  # 投入量を取得
+        input_amount = 10
         self.amount_label.configure(text=f"投入量 {input_amount}%")  # ラベルを更新
 
-    def run_update(self):
-        while True:
-            self.update_input_amount()  # 定期的に更新
-            time.sleep(5)  # 5秒ごとに更新
+   # def run_update(self):
+    #    while True:
+     #       self.update_input_amount()  # 定期的に更新
+      #      time.sleep(5)  # 5秒ごとに更新

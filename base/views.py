@@ -49,8 +49,10 @@ class MainView:
         # 日付表示
         self.date_label = ctk.CTkLabel(left_frame, text="8月27日火曜日", font=("Arial", 18), text_color="#cccccc")
         self.date_label.pack(anchor="center", pady=(0, 5))
-        # 投入量表示フレームを追加
-        input_amount_frame = InputAmountFrame(left_frame)  # InputAmountFrameを使用
+
+        self.create_amount_display(left_frame)  # 追加
+
+        #input_amount_frame = InputAmountFrame(left_frame)  # InputAmountFrameを使用
 
         # 中間ストッカーの残量表示フレーム
         create_stocker_frame(top_frame)  # 変更
@@ -59,6 +61,16 @@ class MainView:
         self.under_button = UnderButtonFrame(main_frame, self)
 
         self.update_time()
+
+    def create_amount_display(self, parent_frame):
+        # 投入量表示フレームを作成
+        self.amount_label = ctk.CTkLabel(parent_frame, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
+        self.amount_label.pack(anchor="center", padx=35, pady=(15, 0))
+
+        self.rate_label = ctk.CTkLabel(parent_frame, text="投入口の稼働率", font=("Arial", 12), text_color="#cccccc")
+        self.rate_label.pack(anchor="center", padx=5, pady=(0, 5))
+        input_amount = 10
+        self.amount_label.configure(text=f"投入量 {input_amount}%")
 
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
