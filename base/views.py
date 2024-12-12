@@ -2,6 +2,9 @@ import customtkinter as ctk
 import tkinter.messagebox as messagebox
 from datetime import datetime
 from PIL import Image
+import threading
+import queue
+import time
 from src.viewmodels import MainViewModel
 from src.base.menteviews import MaintenanceView  
 from src.ui.UnderButton.UnderButton import UnderButtonFrame
@@ -9,6 +12,49 @@ from src.ui.EarPop.EarPopup import ErrorPopup
 from src.ui.stocker.stoker import create_stocker_frame  # 追加
 from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeをインポート
 from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
+from src.struct_command import *
+from ..struct_command import *
+
+structsize = [
+0, 2, 2, 3, 2, 4, 4, 3, 2, 12, 3, 3, 3, 4, 5, 2, 3,
+2, 5, 4, 2, 2, 2, 2, 2, 3, 2, 3
+]
+
+class SerialThread:
+  def __init__(self, receive_data_queue):
+    self.receive_data_queue = receive_data_queue
+    self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
+    # 処理スレッドの開始
+    self.thread = threading.Thread(target=self.SerialProcess)
+    self.thread.daemon = True
+    self.thread.start()
+    
+  def SerialProcess(self):
+    i = 0
+    while True:
+      #シリアル受信処理
+      try:
+        # 集計結果をキューに送信
+        serial_get_data = self.serial_test_data[i]
+        
+        self.receive_data_queue.put(serial_get_data)
+          
+      except Exception as e:
+        self.receive_data_queue.put((-1, str(e)))
+      finally:
+        #self.receive_data_queue.put(('close_window', None))
+        i += 1
+        if i>len(self.serial_test_data)-1 :
+          i=0
+        time.sleep(0.5)
+      #シリアル送信処理
+      try:
+        data = self.receive_data_queue.get_nowait()
+       # print(data)          
+      except queue.Empty:
+        pass
+      finally:
+        time.sleep(0.5)
 
 class MainView:
     def __init__(self, master):
@@ -42,6 +88,12 @@ class MainView:
         left_frame = ctk.CTkFrame(top_frame, fg_color="#2b2b2b")
         left_frame.pack(side="left")
 
+        #シリアル通信テスト
+        self.p = Protocol()
+        self.receive_data_queue = queue.Queue()
+        self.thread = SerialThread(self.receive_data_queue)
+        #self.check_queue()
+
         # 時間表示
         self.time_label = ctk.CTkLabel(left_frame, text="10:55", font=("Arial", 60, "bold"), text_color="#ffffff")
         self.time_label.pack(anchor="center", pady=(0, 0))
@@ -50,8 +102,8 @@ class MainView:
         self.date_label = ctk.CTkLabel(left_frame, text="8月27日火曜日", font=("Arial", 18), text_color="#cccccc")
         self.date_label.pack(anchor="center", pady=(0, 5))
 
-        self.create_amount_display(left_frame)  # 追加
-
+        self.amount_label = self.create_amount_display(left_frame)  # 追加
+        self.check_queue()
         #input_amount_frame = InputAmountFrame(left_frame)  # InputAmountFrameを使用
 
         # 中間ストッカーの残量表示フレーム
@@ -60,7 +112,30 @@ class MainView:
         # 下部フレーム（ボタン）
         self.under_button = UnderButtonFrame(main_frame, self)
 
+
+
         self.update_time()
+
+    def check_queue(self):
+          try:
+            #while True:
+                data = self.receive_data_queue.get_nowait()
+                #data = [0x65,0x01,0x01]
+               # print(code_num ,data)
+                self.p = self.p.set_protocol(data,structsize)
+
+                #self.frame1_code["text"] =  self.p.connectionCheck.address
+                #self.frame1_data["text"] =  self.p.connectionCheck.command
+                #self.frame1_data["text"] =  self.p.inputStockerStatus
+                #print(self.p)
+                self.stocker_capacity = self.p.inputStockerStatus.capacity
+                self.update_amount_display(self.amount_label,self.stocker_capacity)
+                print(self.p.inputStockerStatus)
+          except queue.Empty:
+              pass
+          finally:
+              self.master.after(100, self.check_queue)
+
 
     def create_amount_display(self, parent_frame):
         # 投入量表示フレームを作成
@@ -71,6 +146,10 @@ class MainView:
         self.rate_label.pack(anchor="center", padx=5, pady=(0, 5))
         input_amount = 10
         self.amount_label.configure(text=f"投入量 {input_amount}%")
+        return self.amount_label
+    
+    def update_amount_display(self, amount_label, input_amount):
+        amount_label.configure(text=f"投入量 {input_amount}%")  # ラベルを更新
 
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す

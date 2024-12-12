@@ -34,6 +34,7 @@ class Protocol:
     def __init__(self):
         self.stockerTypeChange = None
         self.errorInfo = None
+        self.inputStockerStatus = None
         #pass
 
 
@@ -52,6 +53,7 @@ class Protocol:
 
     def set_protocol(self,receivedata, structsize):
         p = Protocol()
+        print(receivedata)
         command = receivedata[1]
 
         if command == DUMMYCOMMAND:  # ダミーコマンド
