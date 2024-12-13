@@ -46,11 +46,14 @@ class UnderButtonFrame:
     def open_setting_view(self):
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
-        MaintenanceView(setting_window, self.on_setting_close)  # MaintenanceViewを開く
+        MaintenanceView(setting_window, self.on_setting_close,self.callback_test)  # MaintenanceViewを開く
 
-    def on_setting_close(self):
-        self.master.deiconify()  # 元のウィンドウを再表示
-
+    def on_setting_close(self):       
+        self.master.deiconify()
+          # 元のウィンドウを再表示
+    def callback_test(self,data):
+        print(data)
+        
     def handle_button_click(self, button_name, command, use_timer):
         if self.button_enabled[button_name]:
             if use_timer:
@@ -121,4 +124,5 @@ class UnderButtonFrame:
 
     def open_shutdown_confirmation(self):
         # シャットダウン確認ポップアップを表示
+        
         self.shutdown_popup.shutdown_button_action()  # インスタンスメソッドを呼び出す
