@@ -14,6 +14,7 @@ from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeを
 from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
 from src.struct_command import *
 from ..struct_command import *
+from .settingviews import *
 
 structsize = [
 0, 2, 2, 3, 2, 4, 4, 3, 2, 12, 3, 3, 3, 4, 5, 2, 3,
@@ -125,8 +126,8 @@ class MainView:
 
               self.stocker_capacity = self.p.inputStockerStatus.capacity
               self.update_amount_display(self.amount_label,self.stocker_capacity)
-              print(self.p.inputStockerStatus)
-          
+              #print(self.p.inputStockerStatus)
+              print(self.selected_values)
               #self.midStockerStatus_capacity = self.p.midStockerStatus.capacity
               #print(self.p.midStockerStatus)
           except queue.Empty:

@@ -8,6 +8,7 @@ class MaintenanceView:
         self.on_close = on_close
         self.selected_labels = [None] * 3  # 選択されたラベルを保持するリスト
         self.error_popup = ErrorPopup(master)  # エラーポップアップのインスタンスを作成
+        self.stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]  # ストッカーラベルをクラス属性として追加
         self.selected_values = []  # 選択された値を保存するリストを追加
         self.setup_ui()
 
@@ -65,7 +66,7 @@ class MaintenanceView:
 
     def confirm_selection(self):
         # 選択されたストッカーを表示
-        self.selected_values = [label.get() for label in self.selected_labels]  # 選択された値を保存
+        self.selected_values = [self.stocker_labels.index(label.get()) for label in self.selected_labels]  # 選択された値を整数のインデックスで保存
         
         # 同じ項目が選ばれているかチェック
         if len(self.selected_values) != len(set(self.selected_values)):

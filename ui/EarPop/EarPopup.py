@@ -67,7 +67,7 @@ class ErrorPopup:
         
         # エラーメッセージフレーム
         error_frame = ctk.CTkFrame(overlay, fg_color='black', corner_radius=10,
-                                 width=500, height=350)
+                                 width=800, height=480)
         error_frame.place(relx=0.5, rely=0.5, anchor="center")
         error_frame.pack_propagate(False)
         

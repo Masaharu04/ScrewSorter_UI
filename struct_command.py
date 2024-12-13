@@ -14,7 +14,7 @@ DISCRIMINATIONRESULT = 10 # 判別結果
 INPUTSTOCKERSTATUS = 11 # 投入部ストッカ状況
 ERRORINFO = 12 # エラー情報
 MODULEOPERATION = 13 # モジュール動作
-STOCKERTYPECHANGE = 14 # ストッカ種別変更
+STOCKERTYPECHANGE = 14 # ストッカ種別変更   
 MOTORRESET = 15 # モータリセット
 MOTORMANUALOPERATION = 16 # モーター手動操作
 MIDSTOCKERSTATUSREQUEST = 17 # 中間ストッカ状況要求
@@ -34,7 +34,7 @@ class Protocol:
     def __init__(self):
         self.stockerTypeChange = None
         self.errorInfo = None
-        self.inputStockerStatus = None
+        #self.inputStockerStatus = None
         #pass
 
 
@@ -53,7 +53,7 @@ class Protocol:
 
     def set_protocol(self,receivedata, structsize):
         p = Protocol()
-        print(receivedata)
+        #print(receivedata)
         command = receivedata[1]
 
         if command == DUMMYCOMMAND:  # ダミーコマンド
