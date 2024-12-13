@@ -23,6 +23,7 @@ structsize = [
 class SerialThread:
   def __init__(self, receive_data_queue):
     self.receive_data_queue = receive_data_queue
+    #self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -102,11 +103,11 @@ class MainView:
         self.date_label = ctk.CTkLabel(left_frame, text="8月27日火曜日", font=("Arial", 18), text_color="#cccccc")
         self.date_label.pack(anchor="center", pady=(0, 5))
 
+        #投入量の残量
         self.amount_label = self.create_amount_display(left_frame)  # 追加
         self.check_queue()
-        #input_amount_frame = InputAmountFrame(left_frame)  # InputAmountFrameを使用
 
-        # 中間ストッカーの残量表示フレーム
+        # 中間ストッカーの残量
         create_stocker_frame(top_frame)  # 変更
 
         # 下部フレーム（ボタン）
@@ -116,21 +117,18 @@ class MainView:
 
         self.update_time()
 
+    #シリアル通信へのリクエスト
     def check_queue(self):
           try:
-            #while True:
-                data = self.receive_data_queue.get_nowait()
-                #data = [0x65,0x01,0x01]
-               # print(code_num ,data)
-                self.p = self.p.set_protocol(data,structsize)
+              data = self.receive_data_queue.get_nowait()
+              self.p = self.p.set_protocol(data,structsize)
 
-                #self.frame1_code["text"] =  self.p.connectionCheck.address
-                #self.frame1_data["text"] =  self.p.connectionCheck.command
-                #self.frame1_data["text"] =  self.p.inputStockerStatus
-                #print(self.p)
-                self.stocker_capacity = self.p.inputStockerStatus.capacity
-                self.update_amount_display(self.amount_label,self.stocker_capacity)
-                print(self.p.inputStockerStatus)
+              self.stocker_capacity = self.p.inputStockerStatus.capacity
+              self.update_amount_display(self.amount_label,self.stocker_capacity)
+              print(self.p.inputStockerStatus)
+          
+              #self.midStockerStatus_capacity = self.p.midStockerStatus.capacity
+              #print(self.p.midStockerStatus)
           except queue.Empty:
               pass
           finally:
