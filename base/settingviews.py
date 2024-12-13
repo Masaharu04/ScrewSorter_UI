@@ -3,11 +3,13 @@ from src.ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
 from src.ui.stocker.stoker import create_stocker_frame
 
 class MaintenanceView:
-    def __init__(self, master, on_close):
+    def __init__(self, master, on_close,callback_test):
         self.master = master
         self.on_close = on_close
+        self.callback_test = callback_test
         self.selected_labels = [None] * 3  # 選択されたラベルを保持するリスト
         self.error_popup = ErrorPopup(master)  # エラーポップアップのインスタンスを作成
+        self.stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]  # ストッカーラベルをクラス属性として追加
         self.selected_values = []  # 選択された値を保存するリストを追加
         self.setup_ui()
 
@@ -65,7 +67,7 @@ class MaintenanceView:
 
     def confirm_selection(self):
         # 選択されたストッカーを表示
-        self.selected_values = [label.get() for label in self.selected_labels]  # 選択された値を保存
+        self.selected_values = [self.stocker_labels.index(label.get()) for label in self.selected_labels]  # 選択された値を整数のインデックスで保存
         
         # 同じ項目が選ばれているかチェック
         if len(self.selected_values) != len(set(self.selected_values)):
@@ -75,7 +77,7 @@ class MaintenanceView:
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
 
     def close_maintenance_view(self):
+        self.callback_test(1)
         self.master.destroy() 
         print(self.selected_values)
         return self.selected_values
-    
