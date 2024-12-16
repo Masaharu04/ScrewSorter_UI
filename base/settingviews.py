@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from src.ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
-from src.ui.stocker.stoker import create_stocker_frame
+#from src.ui.stocker.stoker import create_stocker_frame
 
 class MaintenanceView:
     def __init__(self, master, on_close,callback_test):

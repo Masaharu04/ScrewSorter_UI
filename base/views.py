@@ -9,7 +9,7 @@ from src.viewmodels import MainViewModel
 from src.base.menteviews import MaintenanceView  
 from src.ui.UnderButton.UnderButton import UnderButtonFrame
 from src.ui.EarPop.EarPopup import ErrorPopup
-from src.ui.stocker.stoker import create_stocker_frame  # 追加
+from ..ui.stocker.stoker import StockerApp
 from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeをインポート
 from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
 from src.struct_command import *
@@ -69,6 +69,7 @@ class MainView:
 
         # カーソルを非表示にする
         self.master.config(cursor="")
+        stocker_labels = [1, 2, 3]
 
     def setup_ui(self):
         self.master.geometry('800x480')
@@ -109,7 +110,7 @@ class MainView:
         self.check_queue()
 
         # 中間ストッカーの残量
-        create_stocker_frame(top_frame)  # 変更
+        self.update_stocker_value(top_frame)
 
         # 下部フレーム（ボタン）
         self.under_button = UnderButtonFrame(main_frame, self)
@@ -153,11 +154,15 @@ class MainView:
     def update_amount_display(self, amount_label, input_amount):
         amount_label.configure(text=f"投入量 {input_amount}%")  # ラベルを更新
 
+    def update_stocker_value(self, top_frame):
+        self.stocker_frame = StockerApp(top_frame)
+
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 
     def display_message(self, text):
         print(text)  # メッセージをコンソールに出力
+
 
     def show_warning(self):
         # テスト用にエラーコードをセット
