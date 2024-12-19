@@ -5,6 +5,7 @@ from PIL import Image
 import threading
 import queue
 import time
+import serial
 from src.viewmodels import MainViewModel
 from src.base.menteviews import MaintenanceView  
 from src.ui.UnderButton.UnderButton import UnderButtonFrame
@@ -14,7 +15,15 @@ from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeを
 from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
 from src.struct_command import *
 from ..struct_command import *
-#from .settingviews import sharedata
+
+SERIAL_PORT = '/dev/ttyS0'
+BAUD_RATE = 115200
+
+INPUT_ADDR = 1
+DISCRIMINATION_ADDR = 2
+RETURN_ADDR = 3
+ALIGNMENT_ADDR = 4
+MASTER_ADDR = 6 
 
 structsize = [
 0, 2, 2, 3, 2, 4, 4, 3, 2, 12, 3, 3, 3, 4, 5, 2, 3,
@@ -22,10 +31,18 @@ structsize = [
 ]
 
 class SerialThread:
-  def __init__(self, receive_data_queue):
+  def __init__(self, receive_data_queue,send_data_queue):
     self.receive_data_queue = receive_data_queue
-    #self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
+    self.send_data_queue = send_data_queue
+
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
+
+    try:
+      self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    except serial.SerialException as e:
+      print(f"シリアルポートの初期化に失敗しました: {e}")
+      self.ser = None
+
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
     self.thread.daemon = True
@@ -34,29 +51,70 @@ class SerialThread:
   def SerialProcess(self):
     i = 0
     while True:
-      #シリアル受信処理
+      serial_get_data = 0
       try:
-        # 集計結果をキューに送信
-        serial_get_data = self.serial_test_data[i]
-        
-        self.receive_data_queue.put(serial_get_data)
-          
+        print(f"受信データ数: {self.ser.in_waiting}")
+        print(getSelectBitValue(100,2))
+
+        if self.ser.in_waiting >= 2:
+          header:bytes = self.ser.read(2) #self.ser.readline()
+          print(type(header))
+          print({header.hex("-")})
+          command_num:int = header[1]
+          print("command_num hex")
+          print(hex(command_num))
+          print("command_num")
+          print(command_num)
+          data_size = structsize[command_num]
+          print(type(int(data_size)))
+          print(int(data_size))
+
+          if self.ser.in_waiting >= data_size - 2:
+            data:bytes = self.ser.read(data_size)
+            print("残りのdata")
+            print(data.hex("-"))
+          else:
+            data = 0
+            print("only 2 data")
+
+          serial_get_data = header + data
+          print(serial_get_data.hex("-"))
+          self.receive_data_queue.put(serial_get_data) 
+        else:
+          print("no data")
+            
       except Exception as e:
         self.receive_data_queue.put((-1, str(e)))
       finally:
-        #self.receive_data_queue.put(('close_window', None))
         i += 1
         if i>len(self.serial_test_data)-1 :
           i=0
         time.sleep(0.5)
-      #シリアル送信処理
+
       try:
-        data = self.receive_data_queue.get_nowait()
-       # print(data)          
+          data_to_send = self.send_data_queue.get_nowait()
+          self.ser.write(f"{data_to_send}\n".encode('utf-8'))
+          print(f"Sent: {data_to_send}")
       except queue.Empty:
-        pass
+          pass
       finally:
-        time.sleep(0.5)
+          time.sleep(0.5)
+
+def decimalToBinaryList(num: int):
+    binary_representation = bin(num)[2:]
+    bit_list = [int(bit) for bit in binary_representation.zfill(8)]
+    return bit_list
+
+def getSelectBitValue(num: int, bit_position: int):
+    bit_list = decimalToBinaryList(num)
+    bit_count = len(bit_list)
+
+    if bit_position >= 0 and bit_position < bit_count:
+      select_bit_value = bit_list[-(bit_position + 1)]
+    else:
+      print("error!")
+
+    return select_bit_value
 
 class MainView:
     def __init__(self, master):
@@ -69,7 +127,6 @@ class MainView:
 
         # カーソルを非表示にする
         self.master.config(cursor="")
-        stocker_labels = [1, 2, 3]
 
     def setup_ui(self):
         self.master.geometry('800x480')
@@ -93,9 +150,10 @@ class MainView:
 
         #シリアル通信テスト
         self.p = Protocol()
+        #キューの初期化
         self.receive_data_queue = queue.Queue()
-        self.thread = SerialThread(self.receive_data_queue)
-        #self.check_queue()
+        self.send_data_queue = queue.Queue()
+        self.thread = SerialThread(self.receive_data_queue, self.send_data_queue)
 
         # 時間表示
         self.time_label = ctk.CTkLabel(left_frame, text="10:55", font=("Arial", 60, "bold"), text_color="#ffffff")
@@ -106,7 +164,8 @@ class MainView:
         self.date_label.pack(anchor="center", pady=(0, 5))
 
         #投入量の残量
-        self.amount_label = self.create_amount_display(left_frame)  # 追加
+        self.amount_label = self.create_amount_display(left_frame) 
+        
         self.check_queue()
 
         # 中間ストッカーの残量
@@ -120,22 +179,27 @@ class MainView:
     #シリアル通信へのリクエスト
     def check_queue(self):
           try:
+            while True:
               data = self.receive_data_queue.get_nowait()
               self.p = self.p.set_protocol(data,structsize)
+              command = data[1]
 
-              self.stocker_capacity = self.p.inputStockerStatus.capacity
-              self.update_amount_display(self.amount_label,self.stocker_capacity)
-              #print(self.p.inputStockerStatus)
+              if command == INPUTSTOCKERSTATUS:
+                self.stocker_capacity = self.p.inputStockerStatus.capacity
+                self.update_amount_display(self.amount_label,self.stocker_capacity)
 
-            #  selected_values = sharedata
-             # print(self.selected_values)
-
-              #self.midStockerStatus_capacity = self.p.midStockerStatus.capacity
-              #print(self.p.midStockerStatus)
           except queue.Empty:
               pass
           finally:
               self.master.after(100, self.check_queue)
+
+  
+    def send_data(self):
+      data_to_send = self.send_entry.get()
+      print(type(data_to_send))
+      if data_to_send:
+          self.send_data_queue.put(data_to_send)
+          print(f"Enqueued for Sending: {data_to_send}")
 
 
     def create_amount_display(self, parent_frame):
@@ -158,27 +222,6 @@ class MainView:
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 
-    def display_message(self, text):
-        print(text)  # メッセージをコンソールに出力
-
-
-    def show_warning(self):
-        # テスト用にエラーコードをセット
-        self.viewmodel.set_error_code("E001")
-
-    def on_settings_close(self):
-        self.master.deiconify()
-
-    def open_maintenance_view(self):
-        # メンテナンス画面を開く前に、元のウィンドウを隠す
-        maintenance_window = ctk.CTkToplevel(self.master)
-        MaintenanceView(maintenance_window, self.on_maintenance_close)
-        self.master.withdraw()  # メンテナンス画面が開いた後に、元のウィンドウを隠す
-        maintenance_window.protocol("WM_DELETE_WINDOW", self.on_maintenance_close)
-
-    def on_maintenance_close(self):
-        self.master.deiconify()
-
     def start_error_monitoring(self):
         # エラーコードをチェックして、必要に応じてポップアップを表示
         error_code = self.viewmodel.get_error_code()  # ViewModelからエラーコードを取得
@@ -186,10 +229,6 @@ class MainView:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
 
-    def update_stocker_labels(self, selected_values):
-        # 選択されたストッカーを表示する処理を追加
-        print(f"表示するストッカー: {selected_values}")
-        # ここでUIに反映させる処理を追加することができます
 
 def start_main_view():
     root = ctk.CTk()

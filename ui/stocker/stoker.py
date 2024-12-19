@@ -73,9 +73,7 @@ class StockerApp:
             1: "ボルトM4(6mm)",
             2: "ボルトM4(8mm)"
         }
-        print(type(pos_data))
 
-        # 追加: stocker_labelsに基づいて表示するラベルを設定
         for i in range(3):
             self.label_buf[i].configure(text=f"{label_mapping[pos_data[i]]}")
 
