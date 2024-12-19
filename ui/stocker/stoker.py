@@ -7,9 +7,10 @@ class StockerApp:
     def __init__(self, parent):
         self.param_manager = ParamManager()
         self.stocker_values = self.param_manager.get_stocker_values()
-        self.stocker_labels = self.param_manager.get_stocker_pos()
+        self.stocker_labels = [2,2,3]#self.param_manager.get_stocker_pos()
         self.value_labels = []
         self.circles = []
+        self.label_buf = [0,0,0]
         self.create_stocker_frame(parent)
 
     def create_stocker_frame(self, parent):
@@ -28,13 +29,9 @@ class StockerApp:
         }
 
         # 追加: stocker_labelsに基づいて表示するラベルを設定
-        display_labels = [label_mapping[value] for value in self.stocker_labels]
+        self.display_labels = [label_mapping[value] for value in self.stocker_labels]
 
-        # 追加: ラベルと円のウィジェットを保持するリスト
-        self.value_labels = []
-        self.circles = []
-
-        for i, (text, value) in enumerate(zip(display_labels, self.stocker_values)):
+        for i, (text, value) in enumerate(zip(self.display_labels, self.stocker_values)):
             circle_frame = ctk.CTkFrame(stocker_grid, fg_color="#2b2b2b")
             circle_frame.grid(row=0, column=i, padx=5, pady=0)
 
@@ -60,13 +57,27 @@ class StockerApp:
             Svalue_label.place(relx=0.5, rely=0.5, anchor="center")
             self.value_labels.append(Svalue_label)  # 追加: ラベルの情報を保持
 
-            label = ctk.CTkLabel(stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
-            label.grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
+            self.label_buf[i] = ctk.CTkLabel(stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
+            self.label_buf[i].grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
+            print(self.label_buf[i])
 
         for i in range(3):
             stocker_grid.grid_columnconfigure(i, weight=1)
 
-        threading.Thread(target=self.update_stocker_values, args=(self.param_manager,), daemon=True).start()
+        #threading.Thread(target=self.update_stocker_values, args=(self.param_manager,), daemon=True).start()
+
+    def set_data(self, pos_data):
+        self.pos_data:int = pos_data
+        label_mapping = {
+            0: "ボルトM4(5mm)",
+            1: "ボルトM4(6mm)",
+            2: "ボルトM4(8mm)"
+        }
+        print(type(pos_data))
+
+        # 追加: stocker_labelsに基づいて表示するラベルを設定
+        for i in range(3):
+            self.label_buf[i].configure(text=f"{label_mapping[pos_data[i]]}")
 
     def get_text_value(self, value):
         if value == 0:

@@ -5,14 +5,15 @@ import time
 from src.ui.export.export import export_button_action
 from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
 from src.base.settingviews import MaintenanceView  # MaintenanceViewをインポート
-
+from ParamManager.ParamManager import ParamManager 
 class UnderButtonFrame:
-    def __init__(self, master, main_view):
+    def __init__(self, master, main_view, callback):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
         self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
+        self.callback = callback
 
     def setup_buttons(self):
         # ボタンフレーム
@@ -30,8 +31,8 @@ class UnderButtonFrame:
         # ボタン設定
         self.buttons = [
             ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
-            ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", lambda: self.main_view.display_message("一連動作ボタンが押されました"), True)),
-            ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", lambda: self.main_view.display_message("排出ボタンが押されました"), True)),
+            ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", self.print_operation, True)),
+            ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
             ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
             ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.main_view.open_maintenance_view, False)),
             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
@@ -46,7 +47,7 @@ class UnderButtonFrame:
     def open_setting_view(self):
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
-        MaintenanceView(setting_window, self.on_setting_close,self.callback_test)  # MaintenanceViewを開く
+        MaintenanceView(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
 
     def on_setting_close(self):       
         self.master.deiconify()
@@ -126,3 +127,9 @@ class UnderButtonFrame:
         # シャットダウン確認ポップアップを表示
         
         self.shutdown_popup.shutdown_button_action()  # インスタンスメソッドを呼び出す
+
+    def print_operation(self):
+        print("一連動作ボタンが押されました")  # 一連動作ボタンが押されたときの処理
+
+    def discharge_operation(self):
+        print("排出ボタンが押されました")  # 排出ボタンが押されたときの処理

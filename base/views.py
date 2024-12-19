@@ -113,9 +113,7 @@ class MainView:
         self.update_stocker_value(top_frame)
 
         # 下部フレーム（ボタン）
-        self.under_button = UnderButtonFrame(main_frame, self)
-
-
+        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
 
         self.update_time()
 
