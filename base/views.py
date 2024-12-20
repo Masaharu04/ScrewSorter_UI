@@ -1,11 +1,11 @@
 import customtkinter as ctk
-import tkinter.messagebox as messagebox
-from datetime import datetime
-from PIL import Image
+#import tkinter.messagebox as messagebox
+#from datetime import datetime
+#from PIL import Image
 import threading
 import queue
 import time
-import serial
+#import serial
 from src.viewmodels import MainViewModel
 from src.base.menteviews import MaintenanceView  
 from src.ui.UnderButton.UnderButton import UnderButtonFrame
@@ -19,11 +19,18 @@ from ..struct_command import *
 SERIAL_PORT = '/dev/ttyS0'
 BAUD_RATE = 115200
 
-INPUT_ADDR = 1
-DISCRIMINATION_ADDR = 2
-RETURN_ADDR = 3
-ALIGNMENT_ADDR = 4
-MASTER_ADDR = 6 
+MY_ADDR = 0x05
+
+INPUT_ADDR = 0x01
+DISCRIMINATION_ADDR = 0x02
+RETURN_ADDR = 0x03
+ALIGNMENT_ADDR = 0x04
+MASTER_ADDR = 0x06 
+
+addrList = [
+    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR
+]
+
 
 structsize = [
 0, 2, 2, 3, 2, 4, 4, 3, 2, 12, 3, 3, 3, 4, 5, 2, 3,
@@ -37,11 +44,7 @@ class SerialThread:
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
 
-    try:
-      self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    except serial.SerialException as e:
-      print(f"シリアルポートの初期化に失敗しました: {e}")
-      self.ser = None
+
 
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -169,7 +172,8 @@ class MainView:
         self.check_queue()
 
         # 中間ストッカーの残量
-        self.update_stocker_value(top_frame)
+        #self.update_stocker_value(top_frame)
+        self.stocker_frame = StockerApp(top_frame)
 
         # 下部フレーム（ボタン）
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
@@ -188,19 +192,22 @@ class MainView:
                 self.stocker_capacity = self.p.inputStockerStatus.capacity
                 self.update_amount_display(self.amount_label,self.stocker_capacity)
 
+              elif command == MIDSTOCKERSTATUS:
+                 self.stocker_values = self.p.midStockerStatus.capacity
+                 self.update_stocker_value(self, self.stocker_values)
+
           except queue.Empty:
               pass
           finally:
               self.master.after(100, self.check_queue)
 
-  
-    def send_data(self):
-      data_to_send = self.send_entry.get()
-      print(type(data_to_send))
-      if data_to_send:
-          self.send_data_queue.put(data_to_send)
-          print(f"Enqueued for Sending: {data_to_send}")
+    def send_command_SensorInfo(self):
+        command = INPUTSTOCKERSTATUS
 
+        for address in addrList:
+            data_to_send = MY_ADDR + address + command 
+            print(data_to_send)
+            self.send_data_queue.put(data_to_send)
 
     def create_amount_display(self, parent_frame):
         # 投入量表示フレームを作成
@@ -214,11 +221,14 @@ class MainView:
         return self.amount_label
     
     def update_amount_display(self, amount_label, input_amount):
-        amount_label.configure(text=f"投入量 {input_amount}%")  # ラベルを更新
+        amount_label.configure(text=f"投入量 {input_amount}%") 
 
-    def update_stocker_value(self, top_frame):
-        self.stocker_frame = StockerApp(top_frame)
+    def update_stocker_value(self, stocker_values):
+        self.stocker_frame.set_test(stocker_values)
+      
 
+
+  
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 

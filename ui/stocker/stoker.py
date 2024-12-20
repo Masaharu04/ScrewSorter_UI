@@ -1,6 +1,5 @@
 import customtkinter as ctk
 from ParamManager.ParamManager import ParamManager  
-import threading
 import time
 
 class StockerApp:
@@ -12,6 +11,7 @@ class StockerApp:
         self.circles = []
         self.label_buf = [0,0,0]
         self.create_stocker_frame(parent)
+        #self.stocker_value_test = stocker_values
 
     def create_stocker_frame(self, parent):
         stocker_frame = ctk.CTkFrame(parent, fg_color="#2b2b2b")
@@ -30,7 +30,7 @@ class StockerApp:
 
         # 追加: stocker_labelsに基づいて表示するラベルを設定
         self.display_labels = [label_mapping[value] for value in self.stocker_labels]
-
+        #print(self.stocker_value_test)
         for i, (text, value) in enumerate(zip(self.display_labels, self.stocker_values)):
             circle_frame = ctk.CTkFrame(stocker_grid, fg_color="#2b2b2b")
             circle_frame.grid(row=0, column=i, padx=5, pady=0)
@@ -42,11 +42,11 @@ class StockerApp:
             canvas.create_oval(10, 10, 110, 110, fill="#3A3A3A", outline="")
             
             # 追加: 色を取得するための関数を呼び出す
-            text_value, text_color = self.get_text_value(value)  # 新しい関数を作成
-            color = text_color  # ここでcolorを定義
+            text_value, text_color = self.get_text_value(value) 
+            color = text_color
 
             arc = canvas.create_arc(10, 10, 110, 110, start=90, extent=-360 * value, fill=color, outline="")
-            self.circles.append((canvas, arc))  # 追加: 円の情報を保持
+            self.circles.append((canvas, arc))
 
             # 中央の円（くり抜き効果）
             canvas.create_oval(35, 35, 85, 85, fill="#2b2b2b", outline="")
@@ -55,7 +55,7 @@ class StockerApp:
             percentage_value = f"{value * 100:.0f}%"
             Svalue_label = ctk.CTkLabel(circle_frame, text=percentage_value, font=("Arial", 20, "bold"), text_color=text_color)
             Svalue_label.place(relx=0.5, rely=0.5, anchor="center")
-            self.value_labels.append(Svalue_label)  # 追加: ラベルの情報を保持
+            self.value_labels.append(Svalue_label) 
 
             self.label_buf[i] = ctk.CTkLabel(stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
             self.label_buf[i].grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
@@ -65,7 +65,9 @@ class StockerApp:
             stocker_grid.grid_columnconfigure(i, weight=1)
 
         #threading.Thread(target=self.update_stocker_values, args=(self.param_manager,), daemon=True).start()
-
+    def set_test(self, value):
+        #self.stocker_values = value
+        print(value)
     def set_data(self, pos_data):
         self.pos_data:int = pos_data
         label_mapping = {
@@ -87,9 +89,9 @@ class StockerApp:
         else:
             return "強", "#ff0000"
 
-    def update_stocker_values(self, param_manager):
+    def update_stocker_values(self, stocker_values):
         while True:
-            stocker_values = param_manager.get_stocker_values() 
+            stocker_values = stocker_values
             for i, value in enumerate(stocker_values):
               
                 text_value, text_color = self.get_text_value(value)
