@@ -45,7 +45,7 @@ class SerialThread:
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
 
 
-
+'''
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
     self.thread.daemon = True
@@ -118,7 +118,7 @@ def getSelectBitValue(num: int, bit_position: int):
       print("error!")
 
     return select_bit_value
-
+'''
 class MainView:
     def __init__(self, master):
         self.master = master
@@ -170,6 +170,7 @@ class MainView:
         self.amount_label = self.create_amount_display(left_frame) 
         
         self.check_queue()
+        self.sirial_test()
 
         # 中間ストッカーの残量
         #self.update_stocker_value(top_frame)
@@ -180,6 +181,28 @@ class MainView:
 
         self.update_time()
 
+        print("done")
+        
+
+
+    def sirial_test(self):
+      try:
+        while True:
+          photoA_low = 0
+          photoA_mid = 1
+          photoA_high = 0
+          if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
+              photo = ("小")
+          elif photoA_low == 0 and photoA_high == 0:
+              photo = ("中")
+          elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
+              photo = ("大")
+          print(photo)
+      except ZeroDivisionError:
+          print("error")
+      finally:
+         self.master.after(100, self.sirial_test)
+
     #シリアル通信へのリクエスト
     def check_queue(self):
           try:
@@ -187,14 +210,53 @@ class MainView:
               data = self.receive_data_queue.get_nowait()
               self.p = self.p.set_protocol(data,structsize)
               command = data[1]
-
+            
               if command == INPUTSTOCKERSTATUS:
                 self.stocker_capacity = self.p.inputStockerStatus.capacity
                 self.update_amount_display(self.amount_label,self.stocker_capacity)
 
-              elif command == MIDSTOCKERSTATUS:
-                 self.stocker_values = self.p.midStockerStatus.capacity
-                 self.update_stocker_value(self, self.stocker_values)
+              #elif command == MIDSTOCKERSTATUS:
+               #  self.stocker_values = self.p.midStockerStatus.capacity
+                # self.update_stocker_value(self, self.stocker_values)
+        
+              elif command == SENSORINFO:
+                print("okkkkkkk")
+                data1 = decimalToBinaryList(self.p.s.SensorInfo.data1)
+                data2 = decimalToBinaryList(self.p.s.SensorInfo.data2)
+                print("data1")                                
+                print(data1)
+                print("data2")
+                print(data2)
+
+                source_address = data[0] >> 4
+                print("source_address")
+                print(source_address)
+
+                if(source_address == INPUT_ADDR):
+                  input_distance = self.p.sensorInfo.data2
+                elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
+                  #先端の供給されたかどうかのセンサ
+                  photoA = data1[0]
+                  print("photoA")
+                  print(photoA)
+                  photoB = data1[1]
+                  photoC = data1[2]
+                  #ストック量
+                 # photoA_low = data1[3]
+                  #photoA_mid = data1[4]
+                  #photoA_high = data1[5]
+                  photoA_low = 0
+                  photoA_mid = 1
+                  photoA_high = 0
+
+
+                  photoB_low = data1[6]
+                  photoB_mid = data1[7]
+                  photoB_high = data2[0]
+
+                  photoC_low = data2[1]
+                  photoC_mid = data2[2]
+                  photoC_high = data2[3]
 
           except queue.Empty:
               pass
@@ -244,3 +306,4 @@ def start_main_view():
     root = ctk.CTk()
     main_view = MainView(root)
     root.mainloop()
+    

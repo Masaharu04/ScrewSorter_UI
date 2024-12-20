@@ -53,7 +53,7 @@ class UnderButtonFrame:
         self.master.deiconify()
           # 元のウィンドウを再表示
     def callback_test(self,data):
-        print(data)
+        print("data")
         
     def handle_button_click(self, button_name, command, use_timer):
         if self.button_enabled[button_name]:
