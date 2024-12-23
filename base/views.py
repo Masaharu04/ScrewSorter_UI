@@ -169,8 +169,8 @@ class MainView:
         #投入量の残量
         self.amount_label = self.create_amount_display(left_frame) 
         
-        self.check_queue()
-        self.sirial_test()
+        #self.check_queue()
+     
 
         # 中間ストッカーの残量
         #self.update_stocker_value(top_frame)
@@ -180,28 +180,27 @@ class MainView:
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
 
         self.update_time()
+        self.sirial_test()
 
         print("done")
         
 
 
     def sirial_test(self):
-      try:
-        while True:
           photoA_low = 0
           photoA_mid = 1
           photoA_high = 0
           if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
-              photo = ("小")
+              photo = 0
           elif photoA_low == 0 and photoA_high == 0:
-              photo = ("中")
+              photo = 0.3
           elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
-              photo = ("大")
-          print(photo)
-      except ZeroDivisionError:
-          print("error")
-      finally:
-         self.master.after(100, self.sirial_test)
+              photo = 0.6
+          photo = [0.3, 0.3, 0.3]
+          #print(photo)
+        
+          self.stocker_frame.update(photo)
+
 
     #シリアル通信へのリクエスト
     def check_queue(self):
@@ -285,8 +284,8 @@ class MainView:
     def update_amount_display(self, amount_label, input_amount):
         amount_label.configure(text=f"投入量 {input_amount}%") 
 
-    def update_stocker_value(self, stocker_values):
-        self.stocker_frame.set_test(stocker_values)
+   # def update_stocker_value(self, stocker_values):
+       # self.stocker_frame.set_test(stocker_values)
       
 
 
