@@ -41,7 +41,7 @@ class SettingViews:
 
     def _create_stocker_selection(self, parent):
         # ストッカー選択の作成
-        stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]
+        stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)","ボルトM6(8mm)","ボルトM6(15mm)"]
         
         for i in range(3):
             self.selected_labels[i] = ctk.StringVar(value=stocker_labels[0])
@@ -49,7 +49,11 @@ class SettingViews:
             label_frame.pack(anchor="w", padx=20, pady=5)
             ctk.CTkLabel(label_frame, text=f"{chr(65 + i)}:").pack(side="left")  # A, B, Cのラベル
             
-            for label in stocker_labels:
+            for j, label in enumerate(stocker_labels):
+                if j == 0:  # 3番目のラベルで改行
+                    label_frame.pack_forget()  # 現在のフレームを非表示
+                    label_frame = ctk.CTkFrame(parent)  # 新しいフレームを作成
+                    label_frame.pack(anchor="w", padx=20, pady=5)
                 radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label)
                 radio_button.pack(side="left", padx=5)
 

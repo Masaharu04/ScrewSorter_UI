@@ -26,9 +26,14 @@ DISCRIMINATION_ADDR = 0x02
 RETURN_ADDR = 0x03
 ALIGNMENT_ADDR = 0x04
 MASTER_ADDR = 0x06 
+DISCHARGEOPERATION = 0x02,0x03,0x04
+SHUTDOWNCOMMAND = 0x02
+STOPCOMMAND = 0x06
+MODULEOPERATION = 0x01,0x02,0x03,0x04
+STOCKERTYPECHANGE = 0x02
 
 addrList = [
-    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR
+    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR,DISCHARGEOPERATION,SHUTDOWNCOMMAND,STOPCOMMAND,MODULEOPERATION,STOCKERTYPECHANGE
 ]
 
 
@@ -283,6 +288,7 @@ class MainView:
               pass
           finally:
               self.master.after(100, self.check_queue)
+    
 
     def send_command_SensorInfo(self):
         command = INPUTSTOCKERSTATUS
@@ -308,10 +314,7 @@ class MainView:
 
    # def update_stocker_value(self, stocker_values):
        # self.stocker_frame.set_test(stocker_values)
-      
 
-
-  
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 
@@ -322,6 +325,35 @@ class MainView:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
 
+  #シリアル通信送信コマンド
+    def send_rebaseInfo(self):
+      command = DISCHARGEOPERATION
+      for address in addrList:
+            data_to_send = MY_ADDR + address + command
+            print(data_to_send)
+            self.send_data_queue.put(data_to_send)
+
+    def send_input_start(self):
+        command = DISCHARGEOPERATION
+        for address in addrList:
+            data_to_send = MY_ADDR + address + command + 1
+            print(data_to_send)
+            self.send_data_queue.put(data_to_send)
+
+    def send_input_stop(self):
+        command = DISCHARGEOPERATION
+        for address in addrList:
+            data_to_send = MY_ADDR + address + command + 0
+            print(data_to_send)
+            self.send_data_queue.put(data_to_send)
+            
+    def send_stocker(self):
+        command = STOCKERTYPECHANGE
+        for address in addrList:
+            data_to_send = MY_ADDR + address + command + 1011000 + 1011010 + 1011100
+            print(data_to_send)
+            self.send_data_queue.put(data_to_send)
+'''
     def open_maintenance_view(self):
         maintenance_window = ctk.CTkToplevel(self)
         MaintenanceView(maintenance_window, self.on_maintenance_close, self.callback_test, self.callback)
@@ -331,6 +363,7 @@ class MainView:
 
     def callback_test(self, data):
         print("data")
+'''
 
 def start_main_view():
     root = ctk.CTk()
