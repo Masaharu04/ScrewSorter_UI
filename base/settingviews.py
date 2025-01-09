@@ -2,7 +2,7 @@ import customtkinter as ctk
 from src.ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
 #from src.ui.stocker.stoker import create_stocker_frame
 
-class MaintenanceView:
+class SettingViews:
     def __init__(self, master, on_close,callback_test, callback):
         self.master = master
         self.on_close = on_close
@@ -78,9 +78,12 @@ class MaintenanceView:
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
 
     def close_maintenance_view(self):
+        self.master.destroy() 
         self.callback_test(1)
         self.callback(self.selected_values)
-        self.master.destroy() 
         print(self.selected_values)
+        # print("all done")
         return self.selected_values
+    
+        
 

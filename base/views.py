@@ -191,13 +191,35 @@ class MainView:
           photoA_mid = 1
           photoA_high = 0
           if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
-              photo = 0
-          elif photoA_low == 0 and photoA_high == 0:
-              photo = 0.3
+              photoA = 0
+          elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
+              photoA = 0.3
           elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
-              photo = 0.6
-          photo = [0.3, 0.3, 0.3]
-          #print(photo)
+              photoA = 0.6
+
+          photoB_low = 1
+          photoB_mid = 0
+          photoB_high = 0
+          if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
+              photoB = 0
+          elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
+              photoB = 0.3
+          elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
+              photoB = 0.6
+          
+          photoC_low = 0
+          photoC_mid = 0
+          photoC_high = 1
+          if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
+              photoC = 0
+          elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
+              photoC = 0.3
+          elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
+              photoC = 0.6
+
+          photo = [photoA, photoB, photoC]
+          # photo = [0.9, 0.6, 0.3]
+          print(photo)
         
           self.stocker_frame.update(photo)
 
@@ -300,6 +322,15 @@ class MainView:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
 
+    def open_maintenance_view(self):
+        maintenance_window = ctk.CTkToplevel(self)
+        MaintenanceView(maintenance_window, self.on_maintenance_close, self.callback_test, self.callback)
+
+    def on_maintenance_close(self):
+        self.deiconify()
+
+    def callback_test(self, data):
+        print("data")
 
 def start_main_view():
     root = ctk.CTk()

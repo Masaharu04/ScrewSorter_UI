@@ -5,9 +5,8 @@ import time
 class StockerApp:
     def __init__(self, parent):
 
-        #self.stocker_values = [0, 0.3, 0.6] #self.test_value.sirial_test()
-        self.stocker_values = [0, 0.3, 0.6]
-        self.stocker_labels = [2,2,3]#self.param_manager.get_stocker_pos()
+        self.stocker_values = [0.9, 0.9, 0.9]
+        self.stocker_labels = [2,2,3]#ストッカーの順番
         self.value_labels = [0,0,0]
         self.circles = [0,0,0]
         self.label_buf = [0,0,0]
@@ -54,10 +53,7 @@ class StockerApp:
             percentage_value = f"{value * 100:.0f}%"
             self.value_labels[i] = ctk.CTkLabel(self.circle_frame[i], text=percentage_value, font=("Arial", 20, "bold"), text_color=text_color)
             self.value_labels[i].place(relx=0.5, rely=0.5, anchor="center")
-           # self.value_labels.append(Svalue_label) 
-        
-
-
+ 
             self.label_buf[i] = ctk.CTkLabel(self.stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
             self.label_buf[i].grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
            # print(self.label_buf[i])
@@ -66,69 +62,6 @@ class StockerApp:
 
         for i in range(3):
             self.stocker_grid.grid_columnconfigure(i, weight=1)
-
-       # self.create_stocker_frame(parent)
-        #self.stocker_value_test = stocker_values
-
-    def create_stocker_frame(self, parent):
-        #stocker_frame = ctk.CTkFrame(parent, fg_color="#2b2b2b")
-        #stocker_frame.pack(side="right", expand=True, fill="both", padx=(0, 0), pady=(10, 0))
-
-        #ctk.CTkLabel(stocker_frame, text="中間ストッカーの残量", font=("Arial", 18, "bold"), text_color="#ffffff").pack(pady=(0, 0))
-
-        #stocker_grid = ctk.CTkFrame(stocker_frame, fg_color="#2b2b2b")
-        #stocker_grid.pack(expand=True, fill="both")
-
-        
-        '''
-        label_mapping = {
-            1: "ボルトM4(5mm)",
-            2: "ボルトM4(6mm)",
-            3: "ボルトM4(8mm)"
-        }
-
-        # 追加: stocker_labelsに基づいて表示するラベルを設定
-        #self.display_labels = [label_mapping[value] for value in self.stocker_labels]
-        
-        for i, (text, value) in enumerate(zip(self.display_labels, self.stocker_values)):
-            circle_frame = ctk.CTkFrame(stocker_grid, fg_color="#2b2b2b")
-            circle_frame.grid(row=0, column=i, padx=5, pady=0)
-
-            canvas = ctk.CTkCanvas(circle_frame, width=120, height=120, bg="#2b2b2b", highlightthickness=0)
-            canvas.pack()
-
-            # 背景の円
-            canvas.create_oval(10, 10, 110, 110, fill="#3A3A3A", outline="")
-            
-            # 追加: 色を取得するための関数を呼び出す
-            text_value, text_color = self.get_text_value(value) 
-            color = text_color
-
-            arc = canvas.create_arc(10, 10, 110, 110, start=90, extent=-360 * value, fill=color, outline="")
-            self.circles.append((canvas, arc))
-
-            # 中央の円（くり抜き効果）
-            canvas.create_oval(35, 35, 85, 85, fill="#2b2b2b", outline="")
-
-            # 中央の円の中に表示する値を計算
-            percentage_value = f"{value * 100:.0f}%"
-            Svalue_label = ctk.CTkLabel(circle_frame, text=percentage_value, font=("Arial", 20, "bold"), text_color=text_color)
-            Svalue_label.place(relx=0.5, rely=0.5, anchor="center")
-            self.value_labels.append(Svalue_label) 
-
-            self.label_buf[i] = ctk.CTkLabel(stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
-            self.label_buf[i].grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
-            print(self.label_buf[i])
-        '''
-       # for i in range(3):
-            #stocker_grid.grid_columnconfigure(i, weight=1)
-
-        #threading.Thread(target=self.update_stocker_values, args=(self.test_value,), daemon=True).start()
-
-
-        
-
-
 
     def set_data(self, pos_data):
         self.pos_data:int = pos_data
@@ -151,8 +84,6 @@ class StockerApp:
             return "強", "#ff0000"
 
     def update(self, photo):
-       # for i in range(len(self.value_labels)):
-          #  self.value_labels[i].configure(text=f"{photo[i] * 100 :.0f}%")
 
         for i, (text, value) in enumerate(zip(self.display_labels, self.stocker_values)):
             self.circle_frame[i].destroy()

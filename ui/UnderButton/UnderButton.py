@@ -4,7 +4,8 @@ import threading
 import time
 from src.ui.export.export import export_button_action
 from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
-from src.base.settingviews import MaintenanceView  # MaintenanceViewをインポート
+from src.base.settingviews import SettingViews  # MaintenanceViewをインポート
+from src.base.menteviews import MaintenanceView
 from ParamManager.ParamManager import ParamManager 
 class UnderButtonFrame:
     def __init__(self, master, main_view, callback):
@@ -34,7 +35,7 @@ class UnderButtonFrame:
             ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", self.print_operation, True)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
             ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
-            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.main_view.open_maintenance_view, False)),
+            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False)),
             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
         ]
 
@@ -47,10 +48,11 @@ class UnderButtonFrame:
     def open_setting_view(self):
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
-        MaintenanceView(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
+        SettingViews(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
 
     def on_setting_close(self):       
-        self.master.deiconify()
+        # self.master.deiconify()
+        self.master.pack()
           # 元のウィンドウを再表示
     def callback_test(self,data):
         print("data")
@@ -133,3 +135,11 @@ class UnderButtonFrame:
 
     def discharge_operation(self):
         print("排出ボタンが押されました")  # 排出ボタンが押されたときの処理
+
+    def open_maintenance_view(self):
+        maintenance_window = ctk.CTkToplevel(self.master)
+        MaintenanceView(maintenance_window, self.on_maintenance_close)
+
+    def on_maintenance_close(self):
+        # self.master.deiconify()
+        self.master.pack() 
