@@ -50,7 +50,7 @@ class SerialThread:
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
 
 
-'''
+
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
     self.thread.daemon = True
@@ -123,7 +123,7 @@ def getSelectBitValue(num: int, bit_position: int):
       print("error!")
 
     return select_bit_value
-'''
+
 class MainView:
     def __init__(self, master):
         self.master = master
@@ -174,7 +174,7 @@ class MainView:
         #投入量の残量
         self.amount_label = self.create_amount_display(left_frame) 
         
-        #self.check_queue()
+        self.check_queue()
      
 
         # 中間ストッカーの残量
@@ -185,7 +185,7 @@ class MainView:
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
 
         self.update_time()
-        self.sirial_test()
+       # self.sirial_test()
 
         print("done")
         
@@ -263,18 +263,12 @@ class MainView:
                 elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
                   #先端の供給されたかどうかのセンサ
                   photoA = data1[0]
-                  print("photoA")
-                  print(photoA)
                   photoB = data1[1]
                   photoC = data1[2]
                   #ストック量
-                 # photoA_low = data1[3]
-                  #photoA_mid = data1[4]
-                  #photoA_high = data1[5]
-                  photoA_low = 0
-                  photoA_mid = 1
-                  photoA_high = 0
-
+                  photoA_low = data1[3]
+                  photoA_mid = data1[4]
+                  photoA_high = data1[5]
 
                   photoB_low = data1[6]
                   photoB_mid = data1[7]
@@ -283,7 +277,31 @@ class MainView:
                   photoC_low = data2[1]
                   photoC_mid = data2[2]
                   photoC_high = data2[3]
+                
+                  if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
+                      photoA = 0
+                  elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
+                      photoA = 0.3
+                  elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
+                      photoA = 0.6
 
+                  if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
+                      photoB = 0
+                  elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
+                      photoB = 0.3
+                  elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
+                      photoB = 0.6
+
+                  if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
+                      photoC = 0
+                  elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
+                      photoC = 0.3
+                  elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
+                      photoC = 0.6
+
+                  photo = [photoA, photoB, photoC]
+                  self.stocker_frame.update(photo)
+                  
           except queue.Empty:
               pass
           finally:
