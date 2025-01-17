@@ -9,7 +9,8 @@ class SettingViews:
         self.callback_test = callback_test
         self.selected_labels = [None] * 3  # 選択されたラベルを保持するリスト
         self.error_popup = ErrorPopup(master)  # エラーポップアップのインスタンスを作成
-        self.stocker_labels = ["ボルトM4(5mm)", "ボルトM4(6mm)", "ボルトM4(8mm)"]  # ストッカーラベルをクラス属性として追加
+        self.stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)", 
+                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(15mm)"] # ストッカーラベルをクラス属性として追加
         self.selected_values = []  # 選択された値を保存するリストを追加
         self.setup_ui()
         self.callback = callback
@@ -41,7 +42,8 @@ class SettingViews:
 
     def _create_stocker_selection(self, parent):
         # ストッカー選択の作成
-        stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)","ボルトM6(8mm)","ボルトM6(15mm)"]
+        stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)", 
+                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(15mm)"]
         
         for i in range(3):
             self.selected_labels[i] = ctk.StringVar(value=stocker_labels[0])
@@ -49,13 +51,12 @@ class SettingViews:
             label_frame.pack(anchor="w", padx=20, pady=5)
             ctk.CTkLabel(label_frame, text=f"{chr(65 + i)}:").pack(side="left")  # A, B, Cのラベル
             
-            for j, label in enumerate(stocker_labels):
-                if j == 0:  # 3番目のラベルで改行
-                    label_frame.pack_forget()  # 現在のフレームを非表示
-                    label_frame = ctk.CTkFrame(parent)  # 新しいフレームを作成
-                    label_frame.pack(anchor="w", padx=20, pady=5)
-                radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label)
+            for index, label in enumerate(stocker_labels):
+                radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label, width=170, height=50)
                 radio_button.pack(side="left", padx=5)
+                if (index + 1) % 4 == 0:
+                    label_frame.pack(anchor="e")  # 新しい行を作成し、左に揃える
+                    label_frame = ctk.CTkFrame(parent)  # 新しいフレームを作成
 
     def _create_buttons(self, parent):
         # 下部のボタン（全停止と戻る）の作成
@@ -82,12 +83,43 @@ class SettingViews:
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
 
     def close_maintenance_view(self):
+        self.send_sirial()
         self.master.destroy() 
         self.callback_test(1)
         self.callback(self.selected_values)
         print(self.selected_values)
+        
         # print("all done")
         return self.selected_values
-    
+
+
+    def send_sirial(self):
+        print(self.selected_values)
+        new_array = []
+        for value in self.selected_values:
+            if value == 0:
+                new_array.append(10101000)
+            elif value == 1:
+                new_array.append(10101010)
+            elif value == 2:
+                new_array.append(10101100)
+            elif value == 3:
+                new_array.append(10101111)
+            elif value == 4:
+                new_array.append(11001000)
+            elif value == 5:
+                new_array.append(11001010)
+            elif value == 6:
+                new_array.append(11001100)
+            else:
+                new_array.append(11001111)
+        print(new_array)
+
+        from src.base.views import MainView 
+        main_view = MainView(self.master)
+        main_view.send_stocker(new_array)
+
+
+
         
 

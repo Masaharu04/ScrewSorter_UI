@@ -6,7 +6,7 @@ class StockerApp:
     def __init__(self, parent):
 
         self.stocker_values = [0.9, 0.9, 0.9]
-        self.stocker_labels = [2,2,3]#ストッカーの順番
+        self.stocker_labels = [2,2,2]#ストッカーの順番
         self.value_labels = [0,0,0]
         self.circles = [0,0,0]
         self.label_buf = [0,0,0]
@@ -66,9 +66,14 @@ class StockerApp:
     def set_data(self, pos_data):
         self.pos_data:int = pos_data
         label_mapping = {
-            0: "ボルトM4(5mm)",
-            1: "ボルトM4(6mm)",
-            2: "ボルトM4(8mm)"
+            0: "ボルトM5(8mm)",
+            1: "ボルトM5(10mm)",
+            2: "ボルトM5(12mm)",
+            3: "ボルトM5(16mm)",
+            4: "ボルトM6(8mm)",
+            5: "ボルトM6(10mm)",
+            6: "ボルトM6(12mm)",
+            7: "ボルトM6(16mm)"
         }
         for i in range(3):
             self.label_buf[i].configure(text=f"{label_mapping[pos_data[i]]}")
@@ -113,3 +118,6 @@ class StockerApp:
 
             self.label_buf[i] = ctk.CTkLabel(self.stocker_grid, text=text, font=("Arial", 14), text_color="#cccccc", wraplength=120)
             self.label_buf[i].grid(row=1, column=i, padx=5, pady=(5, 0), sticky="nsew")
+
+            
+

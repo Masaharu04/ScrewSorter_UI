@@ -7,6 +7,7 @@ from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスを�
 from src.base.settingviews import SettingViews  # MaintenanceViewをインポート
 from src.base.menteviews import MaintenanceView
 from ParamManager.ParamManager import ParamManager 
+
 class UnderButtonFrame:
     def __init__(self, master, main_view, callback):
         self.master = master
@@ -34,7 +35,7 @@ class UnderButtonFrame:
             ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
             ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", self.print_operation, True)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
-            ("エスポート", "#1f6aa5", lambda: self.handle_button_click("エスポート", export_button_action, True)),
+            ("エクスポート", "#1f6aa5", lambda: self.handle_button_click("エクスポート", export_button_action, True)),
             ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False)),
             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
         ]
@@ -85,7 +86,7 @@ class UnderButtonFrame:
                 button_image = self.cycle_image
             elif text == "排出":
                 button_image = self.discharge_image
-            elif text == "エスポート":
+            elif text == "エクスポート":
                 button_image = self.export_image
             elif text == "メンテナンス":
                 button_image = self.maintenance_image
@@ -134,7 +135,9 @@ class UnderButtonFrame:
         print("一連動作ボタンが押されました")  # 一連動作ボタンが押されたときの処理
 
     def discharge_operation(self):
-        print("排出ボタンが押されました")  # 排出ボタンが押されたときの処理
+        from src.base.views import MainView 
+        self.main_view.send_rebaseInfo()  # MainViewのsend_rebaseInfoを呼び出す
+      # 排出ボタンが押されたときの処理
 
     def open_maintenance_view(self):
         maintenance_window = ctk.CTkToplevel(self.master)
