@@ -1,5 +1,5 @@
 import customtkinter as ctk
-
+import os
 class ShutdownPopup:
     def __init__(self, master):
         self.master = master
@@ -39,8 +39,19 @@ class ShutdownPopup:
         cancel_button.pack(side='right', padx=(10, 50), pady=(10, 20))
 
     def shutdown_action(self):
-        print("シャットダウン処理を実行します")
-        # ここに実際のシャットダウン処理を追加
+        try:
+            print("シャットダウン処理を実行します")
+            
+            from src.base.views import MainView
+
+            main_view = MainView(self.master.winfo_toplevel())
+            main_view.send_shutdown()  # send_shutdown()が他のモジュールとの連携処理を行う
+
+            print("システムをシャットダウンします...")
+            os.system("sudo shutdown -h now")
+
+        except Exception as e:
+            print(f"シャットダウン中にエラーが発生しました: {e}")
      
        
     def close_popup(self, overlay):

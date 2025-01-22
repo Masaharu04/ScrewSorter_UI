@@ -27,8 +27,12 @@ RETURN_ADDR = 0x03
 ALIGNMENT_ADDR = 0x04
 MASTER_ADDR = 0x06 
 
+STOKER_ADDE = 0x02
+POWER_OFF = 0x02
+
+
 addrList = [
-    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR
+    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR,STOKER_ADDE,POWER_OFF
 ]
 
 
@@ -43,9 +47,12 @@ class SerialThread:
     self.send_data_queue = send_data_queue
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
+    #try:
+    #  self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    #except serial.SerialException as e:
+    #  print(f"シリアルポートの初期化に失敗しました: {e}")
+    #  self.ser = None
 
-
-'''
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
     self.thread.daemon = True
@@ -95,10 +102,10 @@ class SerialThread:
         time.sleep(0.5)
 
       try:
-          data_to_send = self.send_data_queue.get_nowait()
-          self.ser.write(f"{data_to_send}\n".encode('utf-8'))
-          print(f"Sent: {data_to_send}")
-      except queue.Empty:
+          #data_to_send = self.send_data_queue.get_nowait()
+          #self.ser.write(data_to_send)
+          
+     # except queue.Empty:
           pass
       finally:
           time.sleep(0.5)
@@ -118,7 +125,16 @@ def getSelectBitValue(num: int, bit_position: int):
       print("error!")
 
     return select_bit_value
-'''
+
+def make_address(myaddress,sendaddress):
+  address_send = (myaddress << 4) | sendaddress
+  return address_send
+
+def make_send_data(address_send,command,data1=0,data2=0,data3=0):
+   send_data = bytearray([address_send,command,data1,data2,data3])
+   return send_data
+
+
 class MainView:
     def __init__(self, master):
         self.master = master
@@ -145,11 +161,11 @@ class MainView:
 
         # 上部フレーム（時間と投入量と中間ストッカーの残量）
         top_frame = ctk.CTkFrame(main_frame, fg_color="#2b2b2b")
-        top_frame.pack(fill="x", padx=10, pady=(10, 0))
+        top_frame.pack(fill="x", padx=(0,10), pady=(10, 0))
 
         # 左側フレーム（時間、日付、投入量）
         left_frame = ctk.CTkFrame(top_frame, fg_color="#2b2b2b")
-        left_frame.pack(side="left")
+        left_frame.pack(side="left",padx=0)
 
         #シリアル通信テスト
         self.p = Protocol()
@@ -170,8 +186,10 @@ class MainView:
         self.amount_label = self.create_amount_display(left_frame) 
         
         self.check_queue()
-        self.sirial_test()
-
+    
+        
+      #  send_rebaseInfo()
+        
         # 中間ストッカーの残量
         #self.update_stocker_value(top_frame)
         self.stocker_frame = StockerApp(top_frame)
@@ -180,35 +198,55 @@ class MainView:
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
 
         self.update_time()
-
-        print("done")
+        self.sirial_test()
         
 
+        print("done")
 
     def sirial_test(self):
-      try:
-        while True:
           photoA_low = 0
           photoA_mid = 1
           photoA_high = 0
           if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
-              photo = ("小")
-          elif photoA_low == 0 and photoA_high == 0:
-              photo = ("中")
+              photoA = 0
+          elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
+              photoA = 0.3
           elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
-              photo = ("大")
-          print(photo)
-      except ZeroDivisionError:
-          print("error")
-      finally:
-         self.master.after(100, self.sirial_test)
+              photoA = 0.6
 
+          photoB_low = 1
+          photoB_mid = 0
+          photoB_high = 0
+          if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
+              photoB = 0
+          elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
+              photoB = 0.3
+          elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
+              photoB = 0.6
+          
+          photoC_low = 0
+          photoC_mid = 0
+          photoC_high = 1
+          if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
+              photoC = 0
+          elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
+              photoC = 0.3
+          elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
+              photoC = 0.6
+
+          photo = [photoA, photoB, photoC]
+        #   起動時初期化処理
+          photo = [0, 0, 0]
+          print(photo)
+        
+          self.stocker_frame.update(photo)
+          
     #シリアル通信へのリクエスト
     def check_queue(self):
           try:
             while True:
               data = self.receive_data_queue.get_nowait()
-              self.p = self.p.set_protocol(data,structsize)
+              self.p.set_protocol(data,structsize)
               command = data[1]
             
               if command == INPUTSTOCKERSTATUS:
@@ -237,18 +275,12 @@ class MainView:
                 elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
                   #先端の供給されたかどうかのセンサ
                   photoA = data1[0]
-                  print("photoA")
-                  print(photoA)
                   photoB = data1[1]
                   photoC = data1[2]
                   #ストック量
-                 # photoA_low = data1[3]
-                  #photoA_mid = data1[4]
-                  #photoA_high = data1[5]
-                  photoA_low = 0
-                  photoA_mid = 1
-                  photoA_high = 0
-
+                  photoA_low = data1[3]
+                  photoA_mid = data1[4]
+                  photoA_high = data1[5]
 
                   photoB_low = data1[6]
                   photoB_mid = data1[7]
@@ -257,40 +289,65 @@ class MainView:
                   photoC_low = data2[1]
                   photoC_mid = data2[2]
                   photoC_high = data2[3]
+                
+                  if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
+                      photoA = 0
+                  elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
+                      photoA = 0.3
+                  elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
+                      photoA = 0.6
 
+                  if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
+                      photoB = 0
+                  elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
+                      photoB = 0.3
+                  elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
+                      photoB = 0.6
+
+                  if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
+                      photoC = 0
+                  elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
+                      photoC = 0.3
+                  elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
+                      photoC = 0.6
+
+                  photo = [photoA, photoB, photoC]
+                  self.stocker_frame.update(photo)
+                  
           except queue.Empty:
               pass
           finally:
               self.master.after(100, self.check_queue)
+    
 
-    def send_command_SensorInfo(self):
-        command = INPUTSTOCKERSTATUS
+   # def send_command_SensorInfo(self):
+    #    command = INPUTSTOCKERSTATUS
 
-        for address in addrList:
-            data_to_send = MY_ADDR + address + command 
-            print(data_to_send)
-            self.send_data_queue.put(data_to_send)
+        #for address in addrList:
+         #   data_to_send = MY_ADDR + address + command 
+          #  print(data_to_send)
+            #self.send_data_queue.put(data_to_send)
 
     def create_amount_display(self, parent_frame):
-        # 投入量表示フレームを作成
-        self.amount_label = ctk.CTkLabel(parent_frame, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
-        self.amount_label.pack(anchor="center", padx=35, pady=(15, 0))
+        # 投入量表示フレームを作成し、単色の背景を追加
+        self.amount_frame = ctk.CTkFrame(parent_frame, fg_color="#3A3A3A")  # フレーム全体に単色の背景を設定
+        self.amount_frame.pack(side="left", padx=(20,0), pady=(15, 0), expand=True, fill="both")
 
-        self.rate_label = ctk.CTkLabel(parent_frame, text="投入口の稼働率", font=("Arial", 12), text_color="#cccccc")
-        self.rate_label.pack(anchor="center", padx=5, pady=(0, 5))
-        input_amount = 10
+        self.amount_label = ctk.CTkLabel(self.amount_frame, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
+        self.amount_label.pack(anchor="center", padx=52, pady=(15, 0))
+
+        self.rate_label = ctk.CTkLabel(self.amount_frame, text="投入口の稼働率", font=("Arial", 12), text_color="#cccccc")
+        self.rate_label.pack(anchor="center", padx=45, pady=(0, 5))
+        input_amount = 0
         self.amount_label.configure(text=f"投入量 {input_amount}%")
-        return self.amount_label
+        return self.amount_frame
     
     def update_amount_display(self, amount_label, input_amount):
         amount_label.configure(text=f"投入量 {input_amount}%") 
 
-    def update_stocker_value(self, stocker_values):
-        self.stocker_frame.set_test(stocker_values)
-      
+   # def update_stocker_value(self, stocker_values):
+       # self.stocker_frame.set_test(stocker_values)
 
-
-  
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 
@@ -301,9 +358,112 @@ class MainView:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
 
+  #シリアル通信送信コマンド
+    def send_rebaseInfo(self):
+        command = DISCHARGEOPERATION
+        for addr in [0x02, 0x03, 0x04]:
+            address_send = make_address(MY_ADDR, addr)
+            data_to_send = make_send_data(address_send, command)
+            self.send_data_queue.put(data_to_send)
+        print("排出ボタンが押されました")
+
+    def send_input_start(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,INPUT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
+        print("投入スタートボタンが押されました。")
+
+    def send_input_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,INPUT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("投入ストップボタンが押されました。")
+
+    def send_discrimination_start(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
+        print("判別スタートボタンが押されました。")
+    
+    def send_discrimination_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("判別ストップボタンが押されました。")
+
+    def send_alignment_start(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,RETURN_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
+        print("整列スタートボタンが押されました。")
+
+    def send_alignment_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,RETURN_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("整列ストップボタンが押されました。")
+
+    def send_reabse_start(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
+        print("返却スタートボタンが押されました。")
+
+    def send_rebase_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("返却ストップボタンが押されました。")
+
+    def mastr_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,MASTER_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("全ストップボタンが押されました。")
+            
+    def send_stocker(self,selected_values):
+        print(selected_values)
+        command = STOCKERTYPECHANGE
+        #自分のaddressと送信先のアドレスを結合すうる
+        address_send = make_address(MY_ADDR,STOKER_ADDE);
+        #addressとcommandとdataを合体
+        data_to_send = make_send_data(address_send,command,selected_values[0],selected_values[1],selected_values[2]);
+        print(data_to_send);
+        self.send_data_queue.put(data_to_send)
+        print("ストッカーの格納先が更新されました")
+
+    def send_shutdown(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,POWER_OFF);
+        data_to_send = make_send_data(address_send,command);
+        self.send_data_queue.put(data_to_send)
+        print("画像判別モジュールのラズパイをシャットダウンしました！")
+    
+
+'''
+    def open_maintenance_view(self):
+        maintenance_window = ctk.CTkToplevel(self)
+        MaintenanceView(maintenance_window, self.on_maintenance_close, self.callback_test, self.callback)
+
+    def on_maintenance_close(self):
+        self.deiconify()
+
+    def callback_test(self, data):
+        print("data")
+'''
 
 def start_main_view():
     root = ctk.CTk()
     main_view = MainView(root)
     root.mainloop()
     
+
