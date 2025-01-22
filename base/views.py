@@ -26,14 +26,13 @@ DISCRIMINATION_ADDR = 0x02
 RETURN_ADDR = 0x03
 ALIGNMENT_ADDR = 0x04
 MASTER_ADDR = 0x06 
-DisList = [ 0x02,0x03,0x04]
-SHUTDOWNCOMMAND = 0x02
-STOPCOMMAND = 0x06
-MODULEOPERATION = 0x01,0x02,0x03,0x04
-STOCKERTYPECHANGE = 0x02
+
+STOKER_ADDE = 0x02
+POWER_OFF = 0x02
+
 
 addrList = [
-    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR
+    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR,STOKER_ADDE,POWER_OFF
 ]
 
 
@@ -48,12 +47,11 @@ class SerialThread:
     self.send_data_queue = send_data_queue
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
-    
-    # try:
-    #   self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    # except serial.SerialException as e:
-    #   print(f"シリアルポートの初期化に失敗しました: {e}")
-    #   self.ser = None
+    #try:
+    #  self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    #except serial.SerialException as e:
+    #  print(f"シリアルポートの初期化に失敗しました: {e}")
+    #  self.ser = None
 
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -104,10 +102,10 @@ class SerialThread:
         time.sleep(0.5)
 
       try:
-          data_to_send = self.send_data_queue.get_nowait()
-          #self.ser.write(f"{data_to_send}\n".encode('utf-8'))
-          #print(f"Sent: {data_to_send}")
-      except queue.Empty:
+          #data_to_send = self.send_data_queue.get_nowait()
+          #self.ser.write(data_to_send)
+          
+     # except queue.Empty:
           pass
       finally:
           time.sleep(0.5)
@@ -127,6 +125,15 @@ def getSelectBitValue(num: int, bit_position: int):
       print("error!")
 
     return select_bit_value
+
+def make_address(myaddress,sendaddress):
+  address_send = (myaddress << 4) | sendaddress
+  return address_send
+
+def make_send_data(address_send,command,data1=0,data2=0,data3=0):
+   send_data = bytearray([address_send,command,data1,data2,data3])
+   return send_data
+
 
 class MainView:
     def __init__(self, master):
@@ -154,11 +161,11 @@ class MainView:
 
         # 上部フレーム（時間と投入量と中間ストッカーの残量）
         top_frame = ctk.CTkFrame(main_frame, fg_color="#2b2b2b")
-        top_frame.pack(fill="x", padx=10, pady=(10, 0))
+        top_frame.pack(fill="x", padx=(0,10), pady=(10, 0))
 
         # 左側フレーム（時間、日付、投入量）
         left_frame = ctk.CTkFrame(top_frame, fg_color="#2b2b2b")
-        left_frame.pack(side="left")
+        left_frame.pack(side="left",padx=0)
 
         #シリアル通信テスト
         self.p = Protocol()
@@ -179,9 +186,10 @@ class MainView:
         self.amount_label = self.create_amount_display(left_frame) 
         
         self.check_queue()
+    
         
       #  send_rebaseInfo()
-     
+        
         # 中間ストッカーの残量
         #self.update_stocker_value(top_frame)
         self.stocker_frame = StockerApp(top_frame)
@@ -233,13 +241,6 @@ class MainView:
         
           self.stocker_frame.update(photo)
           
-          command = DISCHARGEOPERATION
-          for address in DisList:
-            data_to_send = MY_ADDR + address + command
-            print(data_to_send)
-            self.send_data_queue.put(data_to_send)
-
-
     #シリアル通信へのリクエスト
     def check_queue(self):
           try:
@@ -319,24 +320,27 @@ class MainView:
               self.master.after(100, self.check_queue)
     
 
-    def send_command_SensorInfo(self):
-        command = INPUTSTOCKERSTATUS
+   # def send_command_SensorInfo(self):
+    #    command = INPUTSTOCKERSTATUS
 
-        for address in addrList:
-            data_to_send = MY_ADDR + address + command 
-            print(data_to_send)
-            self.send_data_queue.put(data_to_send)
+        #for address in addrList:
+         #   data_to_send = MY_ADDR + address + command 
+          #  print(data_to_send)
+            #self.send_data_queue.put(data_to_send)
 
     def create_amount_display(self, parent_frame):
-        # 投入量表示フレームを作成
-        self.amount_label = ctk.CTkLabel(parent_frame, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
-        self.amount_label.pack(anchor="center", padx=35, pady=(15, 0))
+        # 投入量表示フレームを作成し、単色の背景を追加
+        self.amount_frame = ctk.CTkFrame(parent_frame, fg_color="#3A3A3A")  # フレーム全体に単色の背景を設定
+        self.amount_frame.pack(side="left", padx=(20,0), pady=(15, 0), expand=True, fill="both")
 
-        self.rate_label = ctk.CTkLabel(parent_frame, text="投入口の稼働率", font=("Arial", 12), text_color="#cccccc")
-        self.rate_label.pack(anchor="center", padx=5, pady=(0, 5))
-        input_amount = 10
+        self.amount_label = ctk.CTkLabel(self.amount_frame, text="", font=("Arial", 28, "bold"), text_color="#3b8ed0")
+        self.amount_label.pack(anchor="center", padx=52, pady=(15, 0))
+
+        self.rate_label = ctk.CTkLabel(self.amount_frame, text="投入口の稼働率", font=("Arial", 12), text_color="#cccccc")
+        self.rate_label.pack(anchor="center", padx=45, pady=(0, 5))
+        input_amount = 0
         self.amount_label.configure(text=f"投入量 {input_amount}%")
-        return self.amount_label
+        return self.amount_frame
     
     def update_amount_display(self, amount_label, input_amount):
         amount_label.configure(text=f"投入量 {input_amount}%") 
@@ -356,94 +360,94 @@ class MainView:
 
   #シリアル通信送信コマンド
     def send_rebaseInfo(self):
-    #   command = DISCHARGEOPERATION
-    #   for address in addrList:
-    #         data_to_send = MY_ADDR + address + command
-    #         print(data_to_send)
-    #         self.send_data_queue.put(data_to_send)
-         print("排出ボタンが押されました")
+        command = DISCHARGEOPERATION
+        for addr in [0x02, 0x03, 0x04]:
+            address_send = make_address(MY_ADDR, addr)
+            data_to_send = make_send_data(address_send, command)
+            self.send_data_queue.put(data_to_send)
+        print("排出ボタンが押されました")
 
     def send_input_start(self):
-        print("投入スタートボタンが押されました。")
-        command = DISCHARGEOPERATION
-        data_to_send = MY_ADDR + INPUT_ADDR + command + 1
-        print(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,INPUT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
         self.send_data_queue.put(data_to_send)
         print("投入スタートボタンが押されました。")
 
     def send_input_stop(self):
-        command = DISCHARGEOPERATION
-        data_to_send = MY_ADDR + INPUT_ADDR + command + 0
-        print(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,INPUT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
         self.send_data_queue.put(data_to_send)
         print("投入ストップボタンが押されました。")
 
     def send_discrimination_start(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
         print("判別スタートボタンが押されました。")
     
     def send_discrimination_stop(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
         print("判別ストップボタンが押されました。")
 
     def send_alignment_start(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,RETURN_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
         print("整列スタートボタンが押されました。")
 
     def send_alignment_stop(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,RETURN_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
         print("整列ストップボタンが押されました。")
 
     def send_reabse_start(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x01);
+        self.send_data_queue.put(data_to_send)
         print("返却スタートボタンが押されました。")
 
     def send_rebase_stop(self):
-        # command = DISCHARGEOPERATION
-        # for address in addrList:
-        #     data_to_send = MY_ADDR + address + command + 0
-        #     print(data_to_send)
-        #     self.send_data_queue.put(data_to_send)
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
         print("返却ストップボタンが押されました。")
+
+    def mastr_stop(self):
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,MASTER_ADDR);
+        data_to_send = make_send_data(address_send,command,0x00);
+        self.send_data_queue.put(data_to_send)
+        print("全ストップボタンが押されました。")
             
     def send_stocker(self,selected_values):
         print(selected_values)
-        data = 0
-        for i in selected_values:
-            data+selected_values[i]
-        print(data)
         command = STOCKERTYPECHANGE
-        data_to_send = MY_ADDR + STOCKERTYPECHANGE + command + 1011000 + 1011010 + 1011100
-        print(data_to_send)
-       # self.send_data_queue.put(data_to_send)
+        #自分のaddressと送信先のアドレスを結合すうる
+        address_send = make_address(MY_ADDR,STOKER_ADDE);
+        #addressとcommandとdataを合体
+        data_to_send = make_send_data(address_send,command,selected_values[0],selected_values[1],selected_values[2]);
+        print(data_to_send);
+        self.send_data_queue.put(data_to_send)
         print("ストッカーの格納先が更新されました")
 
     def send_shutdown(self):
-        # command = SHUTDOWNCOMMAND
-        # data_to_send = MY_ADDR + SHUTDOWNCOMMAND + command
-        # print(data_to_send)
-        # self.send_data_queue.put(data_to_send)
-        print("コールバック関数テスト")
+        command = MODULEOPERATION
+        address_send = make_address(MY_ADDR,POWER_OFF);
+        data_to_send = make_send_data(address_send,command);
+        self.send_data_queue.put(data_to_send)
+        print("画像判別モジュールのラズパイをシャットダウンしました！")
+    
 
 '''
     def open_maintenance_view(self):
@@ -462,3 +466,4 @@ def start_main_view():
     main_view = MainView(root)
     root.mainloop()
     
+

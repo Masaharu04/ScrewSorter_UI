@@ -6,7 +6,7 @@ class StockerApp:
     def __init__(self, parent):
 
         self.stocker_values = [0.9, 0.9, 0.9]
-        self.stocker_labels = [2,2,2]#ストッカーの順番
+        self.stocker_labels = [1,2,3]#ストッカーの順番
         self.value_labels = [0,0,0]
         self.circles = [0,0,0]
         self.label_buf = [0,0,0]
@@ -20,9 +20,9 @@ class StockerApp:
         self.stocker_grid.pack(expand=True, fill="both")
 
         label_mapping = {
-            1: "ボルトM4(5mm)",
-            2: "ボルトM4(6mm)",
-            3: "ボルトM4(8mm)"
+            1: "(A) ボルトM8(5mm)",
+            2: "(B) ボルトM4(6mm)",
+            3: "(C) ボルトM4(8mm)"
         }
         self.display_labels = [label_mapping[value] for value in self.stocker_labels]
         self.circle_frame = [0,0,0]
@@ -76,7 +76,7 @@ class StockerApp:
             7: "ボルトM6(16mm)"
         }
         for i in range(3):
-            self.label_buf[i].configure(text=f"{label_mapping[pos_data[i]]}")
+            self.label_buf[i].configure(text=f"({chr(65+i)}) {label_mapping[pos_data[i]]}")
 
     def get_text_value(self, value):
         if value == 0:

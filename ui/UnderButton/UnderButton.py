@@ -25,19 +25,21 @@ class UnderButtonFrame:
         # ボタン用の画像を読み込む
         self.button_image = ctk.CTkImage(Image.open("img/settings.png"), size=(60, 60))
         self.poweroff_image = ctk.CTkImage(Image.open("img/poweroff.png"), size=(40, 40))
-        self.cycle_image = ctk.CTkImage(Image.open("img/cycle.png"), size=(50, 50))
+        self.cycle_image = ctk.CTkImage(Image.open("img/cycle.png"), size=(60, 60))
         self.discharge_image = ctk.CTkImage(Image.open("img/exsit.png"), size=(40, 40))
         self.export_image = ctk.CTkImage(Image.open("img/export.png"), size=(60, 60))
         self.maintenance_image = ctk.CTkImage(Image.open("img/maintenance.png"), size=(50, 50))
+        
 
         # ボタン設定
         self.buttons = [
             ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
-            ("一連動作", "#3b8ed0", lambda: self.handle_button_click("一連動作", self.print_operation, True)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
+             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False)),
+            #("", "#3b8ed0", lambda: self.handle_button_click("", self.discharge_operation, True)),
             ("エクスポート", "#1f6aa5", lambda: self.handle_button_click("エクスポート", export_button_action, True)),
-            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False)),
-            ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
+            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False))
+           
         ]
 
         # 各ボタンの初期状態を有効に設定
@@ -90,8 +92,10 @@ class UnderButtonFrame:
                 button_image = self.export_image
             elif text == "メンテナンス":
                 button_image = self.maintenance_image
-            else:  # シャットダウン
+            elif text == "シャットダウン": 
                 button_image = self.poweroff_image
+            else:
+                 button_image = self.cycle_image
             
             # 画像ボタン
             image_button = ctk.CTkLabel(

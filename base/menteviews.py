@@ -31,17 +31,14 @@ class MaintenanceView:
 
     def _create_title(self, parent):
         # タイトルラベルの作成
-        title_label = ctk.CTkLabel(parent, text="メンテナンス画面", font=("Arial", 18))
-        title_label.pack(pady=(0, 5))
+        title_label = ctk.CTkLabel(parent, text="メンテナンス画面", font=("Arial", 20, "bold"))
+        title_label.pack(pady=(7, 5))
 
     def _create_sections(self, parent):
         # 4つのセクションを含むフレームの作成
         sections_frame = ctk.CTkFrame(parent)
         sections_frame.pack(expand=True, fill='both', pady=5)
 
-        # 4つのセクションを2x2グリッドで配置
-        #for i, title in enumerate(["投入", "判別", "整列", "返却"]):
-            #row, col = divmod(i, 4)
         self._input_section(sections_frame, "投入", 1, 1)
         self._discrimination_section(sections_frame, "判別", 1, 2)
         self._alignment_section(sections_frame, "整列", 1, 3)
@@ -50,66 +47,66 @@ class MaintenanceView:
     def _input_section(self, parent, title, row, col):
         # 各セクションの作成
         section_frame = ctk.CTkFrame(parent)
-        section_frame.grid(row=row, column=col, padx=5, pady=5, sticky='nsew')
+        section_frame.grid(row=row, column=col, padx=10, pady=10, sticky='nsew')
 
         # タイトルラベル
-        title_label = ctk.CTkLabel(section_frame, text=title)
-        title_label.pack(pady=(0, 5))
+        title_label = ctk.CTkLabel(section_frame, text=title, font=("Meiryo", 30))
+        title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転", command=lambda t=title: self.input_start(), width=160, height=60)
-        start_button.pack(pady=(0, 5))
+        start_button = ctk.CTkButton(section_frame, text="運転", font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_start(), width=160, height=110)
+        start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止", command=lambda t=title: self.input_stop(), width=160, height=60)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_stop(),fg_color="red", width=160, height=110)
         stop_button.pack()
     def _discrimination_section(self, parent, title, row, col):
         # 各セクションの作成
         section_frame = ctk.CTkFrame(parent)
-        section_frame.grid(row=row, column=col, padx=5, pady=5, sticky='nsew')
+        section_frame.grid(row=row, column=col, padx=10, pady=10, sticky='nsew')
 
         # タイトルラベル
-        title_label = ctk.CTkLabel(section_frame, text=title)
-        title_label.pack(pady=(0, 5))
+        title_label = ctk.CTkLabel(section_frame, text=title, font=("Meiryo", 30))
+        title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転", command=lambda t=title: self.discrimination_start(), width=160, height=60)
-        start_button.pack(pady=(0, 5))
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_start(), width=160, height=110)
+        start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止", command=lambda t=title: self.discrimination_stop(), width=160, height=60)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_stop(),fg_color="red", width=160, height=110)
         stop_button.pack()
     def _alignment_section(self, parent, title, row, col):
         # 各セクションの作成
         section_frame = ctk.CTkFrame(parent)
-        section_frame.grid(row=row, column=col, padx=5, pady=5, sticky='nsew')
+        section_frame.grid(row=row, column=col, padx=10, pady=10, sticky='nsew')
 
         # タイトルラベル
-        title_label = ctk.CTkLabel(section_frame, text=title)
-        title_label.pack(pady=(0, 5))
+        title_label = ctk.CTkLabel(section_frame, text=title, font=("Meiryo", 30))
+        title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転", command=lambda t=title: self.alignment_start(), width=160, height=60)
-        start_button.pack(pady=(0, 5))
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_start(), width=160, height=110)
+        start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止", command=lambda t=title: self.alignment_stop(), width=160, height=60)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_stop(),fg_color="red", width=160, height=110)
         stop_button.pack()
     def _rebase_section(self, parent, title, row, col):
         # 各セクションの作成
         section_frame = ctk.CTkFrame(parent)
-        section_frame.grid(row=row, column=col, padx=5, pady=5, sticky='nsew')
+        section_frame.grid(row=row, column=col, padx=10, pady=10, sticky='nsew')
 
         # タイトルラベル
-        title_label = ctk.CTkLabel(section_frame, text=title)
-        title_label.pack(pady=(0, 5))
+        title_label = ctk.CTkLabel(section_frame, text=title, font=("Meiryo", 30))
+        title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転", command=lambda t=title: self.rebase_start(), width=160, height=60)
-        start_button.pack(pady=(0, 5))
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_start(), width=160, height=110)
+        start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止", command=lambda t=title: self.rebase_stop(), width=160, height=60)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_stop(), fg_color="red", width=160, height=110)
         stop_button.pack()
 
     def _create_buttons(self, parent):
@@ -117,13 +114,14 @@ class MaintenanceView:
         buttons_frame = ctk.CTkFrame(parent)
         buttons_frame.pack(fill='x', pady=5)
 
-        # 全停止ボタン
-        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.stop_all, fg_color="red", width=160, height=60)
-        stop_button.pack(side='left', padx=(0, 5))
-
         # 戻るボタン
-        close_button = ctk.CTkButton(buttons_frame, text="戻る", command=self.close_maintenance_view, width=160, height=60)
-        close_button.pack(side='left')
+        close_button = ctk.CTkButton(buttons_frame, text="戻る", command=self.close_maintenance_view, font=("Meiryo", 20, "bold"),width=200, height=70)
+        close_button.pack(side='left', padx=(10, 10),pady=(10, 10))
+
+        # 全停止ボタン
+        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.stop_all, font=("Meiryo", 20, "bold"), fg_color="red", width=200, height=70)
+        stop_button.pack(side='left', padx=(0, 10),pady=(10, 10))
+
 
     def stop_all(self):
         print("全停止します")
