@@ -43,11 +43,10 @@ class ShutdownPopup:
             print("シャットダウン処理を実行します")
             
             from src.base.views import MainView
-
             main_view = MainView(self.master.winfo_toplevel())
             main_view.send_shutdown()  # send_shutdown()が他のモジュールとの連携処理を行う
 
-            print("システムをシャットダウンします...")
+            print("システムをシャットダウンnow...")
             os.system("sudo shutdown -h now")
 
         except Exception as e:

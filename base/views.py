@@ -186,12 +186,8 @@ class MainView:
         self.amount_label = self.create_amount_display(left_frame) 
         
         self.check_queue()
-    
-        
-      #  send_rebaseInfo()
         
         # 中間ストッカーの残量
-        #self.update_stocker_value(top_frame)
         self.stocker_frame = StockerApp(top_frame)
 
         # 下部フレーム（ボタン）
@@ -200,8 +196,7 @@ class MainView:
         self.update_time()
         self.sirial_test()
         
-
-        print("done")
+        print("初期動作完了")
 
     def sirial_test(self):
           photoA_low = 0
@@ -237,7 +232,7 @@ class MainView:
           photo = [photoA, photoB, photoC]
         #   起動時初期化処理
           photo = [0, 0, 0]
-          print(photo)
+          print("起動時",photo)
         
           self.stocker_frame.update(photo)
           
@@ -253,23 +248,10 @@ class MainView:
                 self.stocker_capacity = self.p.inputStockerStatus.capacity
                 self.update_amount_display(self.amount_label,self.stocker_capacity)
 
-              #elif command == MIDSTOCKERSTATUS:
-               #  self.stocker_values = self.p.midStockerStatus.capacity
-                # self.update_stocker_value(self, self.stocker_values)
-        
               elif command == SENSORINFO:
-                print("okkkkkkk")
                 data1 = decimalToBinaryList(self.p.s.SensorInfo.data1)
                 data2 = decimalToBinaryList(self.p.s.SensorInfo.data2)
-                print("data1")                                
-                print(data1)
-                print("data2")
-                print(data2)
-
                 source_address = data[0] >> 4
-                print("source_address")
-                print(source_address)
-
                 if(source_address == INPUT_ADDR):
                   input_distance = self.p.sensorInfo.data2
                 elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
@@ -320,14 +302,6 @@ class MainView:
               self.master.after(100, self.check_queue)
     
 
-   # def send_command_SensorInfo(self):
-    #    command = INPUTSTOCKERSTATUS
-
-        #for address in addrList:
-         #   data_to_send = MY_ADDR + address + command 
-          #  print(data_to_send)
-            #self.send_data_queue.put(data_to_send)
-
     def create_amount_display(self, parent_frame):
         # 投入量表示フレームを作成し、単色の背景を追加
         self.amount_frame = ctk.CTkFrame(parent_frame, fg_color="#3A3A3A")  # フレーム全体に単色の背景を設定
@@ -344,9 +318,6 @@ class MainView:
     
     def update_amount_display(self, amount_label, input_amount):
         amount_label.configure(text=f"投入量 {input_amount}%") 
-
-   # def update_stocker_value(self, stocker_values):
-       # self.stocker_frame.set_test(stocker_values)
 
     def update_time(self):
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
@@ -447,19 +418,6 @@ class MainView:
         data_to_send = make_send_data(address_send,command);
         self.send_data_queue.put(data_to_send)
         print("画像判別モジュールのラズパイをシャットダウンしました！")
-    
-
-'''
-    def open_maintenance_view(self):
-        maintenance_window = ctk.CTkToplevel(self)
-        MaintenanceView(maintenance_window, self.on_maintenance_close, self.callback_test, self.callback)
-
-    def on_maintenance_close(self):
-        self.deiconify()
-
-    def callback_test(self, data):
-        print("data")
-'''
 
 def start_main_view():
     root = ctk.CTk()

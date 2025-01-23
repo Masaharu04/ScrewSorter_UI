@@ -119,7 +119,7 @@ class MaintenanceView:
         close_button.pack(side='left', padx=(10, 10),pady=(10, 10))
 
         # 全停止ボタン
-        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.stop_all, font=("Meiryo", 20, "bold"), fg_color="red", width=200, height=70)
+        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.master_stop, font=("Meiryo", 20, "bold"), fg_color="red", width=200, height=70)
         stop_button.pack(side='left', padx=(0, 10),pady=(10, 10))
 
 
@@ -138,7 +138,7 @@ class MaintenanceView:
     def input_stop(self):
         from src.base.views import MainView 
         main_view = MainView(self.master)
-        main_view.send_input_start()
+        main_view.send_input_stop()
 
     def discrimination_start(self):
         from src.base.views import MainView 
@@ -148,7 +148,7 @@ class MaintenanceView:
     def discrimination_stop(self):
         from src.base.views import MainView 
         main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+        main_view.send_discrimination_stop()
 
     def alignment_start(self):
         from src.base.views import MainView 
@@ -158,7 +158,7 @@ class MaintenanceView:
     def alignment_stop(self):
         from src.base.views import MainView 
         main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+        main_view.send_discrimination_stop()
 
     def rebase_start(self):
         from src.base.views import MainView 
@@ -168,5 +168,11 @@ class MaintenanceView:
     def rebase_stop(self):
         from src.base.views import MainView 
         main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+        main_view.send_discrimination_stop()
+
+    def master_stop(self):
+        from src.base.views import MainView
+        main_view = MainView(self.master)
+        main_view.mastr_stop(self.master)
+
         
