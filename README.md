@@ -30,20 +30,13 @@ components/
 ## 必要環境
 - Python 3.12.6
 
-## インストール方法
+## 初期インストール方法
 1. リポジトリをクローン
 ```bash
 git clone [リポジトリのURL]
 cd [プロジェクトディレクトリ]
 ```
-
-2. 依存パッケージのインストール（必要な場合）
-```bash
-pip install customtkinter
-pip install Pillow
-```
-
-3. 仮想環境の構築（必要な場合）
+2. 仮想環境の構築
 ```bash
 python -m venv myenv
 ```
@@ -55,14 +48,17 @@ Windows
 ```
 myenv\Scripts\activate
 ```
-パッケージのインストール
+
+4. パッケージのインストール
 ```
 pip install customtkinter Pillow
+pip install pyserial
 ```
 
 ## 実行方法
 ターミナルで以下のコマンドを実行してください：
 ```bash
+source myenv/bin/activate
 python3 main.py
 ```
 
