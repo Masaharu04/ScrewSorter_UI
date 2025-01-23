@@ -52,6 +52,8 @@ myenv\Scripts\activate
 4. パッケージのインストール
 ```
 pip install customtkinter Pillow
+```
+```
 pip install pyserial
 ```
 
@@ -59,6 +61,8 @@ pip install pyserial
 ターミナルで以下のコマンドを実行してください：
 ```bash
 source myenv/bin/activate
+```
+```
 python3 main.py
 ```
 
