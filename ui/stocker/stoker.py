@@ -15,7 +15,7 @@ class StockerApp:
         self.stocker_frame = ctk.CTkFrame(parent, fg_color="#2b2b2b")
         self.stocker_frame.pack(side="right", expand=True, fill="both", padx=(0, 0), pady=(10, 0))
 
-        ctk.CTkLabel(self.stocker_frame, text="中間ストッカーの残量", font=("Arial", 18, "bold"), text_color="#ffffff").pack(pady=(0, 0))
+        ctk.CTkLabel(self.stocker_frame, text="中間ストッカーの残量レベル", font=("Arial", 18, "bold"), text_color="#ffffff").pack(pady=(0, 0))
         self.stocker_grid = ctk.CTkFrame(self.stocker_frame, fg_color="#2b2b2b")
         self.stocker_grid.pack(expand=True, fill="both")
 
@@ -64,6 +64,8 @@ class StockerApp:
             self.stocker_grid.grid_columnconfigure(i, weight=1)
 
     def set_data(self, pos_data):
+        print("///////////////////////////")
+        print(pos_data)
         self.pos_data:int = pos_data
         label_mapping = {
             0: "ボルトM5(8mm)",
