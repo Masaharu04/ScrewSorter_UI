@@ -1,0 +1,5 @@
+[Desktop Entry]
+Type=Application
+Name=Chromakey Program
+Exec=sh -c "sleep 3 && Python /home/Gr3//ver_1.1/Chromakey_110.py"
+X-GNOME-Autostart-enabled=true
