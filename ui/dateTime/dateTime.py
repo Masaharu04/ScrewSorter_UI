@@ -1,5 +1,6 @@
 from datetime import datetime  # datetimeをインポート
 import customtkinter as ctk  # customtkinterをインポート
+import subprocess
 
 def update_time(time_label, date_label):
     current_time = datetime.now().strftime("%H:%M")

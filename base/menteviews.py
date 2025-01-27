@@ -133,6 +133,7 @@ class MaintenanceView:
     def input_start(self):
         from src.base.views import MainView 
         main_view = MainView(self.master)
+        print("iiiiiiiiiiiiiiii")
         main_view.send_input_start()
         
     def input_stop(self):

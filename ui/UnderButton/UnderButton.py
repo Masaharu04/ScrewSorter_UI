@@ -144,6 +144,7 @@ class UnderButtonFrame:
       # 排出ボタンが押されたときの処理
 
     def open_maintenance_view(self):
+ 
         maintenance_window = ctk.CTkToplevel(self.master)
         MaintenanceView(maintenance_window, self.on_maintenance_close)
 
