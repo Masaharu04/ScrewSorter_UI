@@ -15,7 +15,7 @@ from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeを
 from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
 from src.struct_command import *
 from ..struct_command import *
-from src.Serial_send.serialSend import CallbackHandler
+
 
 
 SERIAL_PORT = '/dev/ttyS0'
@@ -143,10 +143,6 @@ class MainView:
         self.viewmodel = MainViewModel()
         self.error_popup = ErrorPopup(master)
         self.error_popup.set_viewmodel(self.viewmodel)
-
-        # ここでcallback_handlerを初期化
-        self.callback_handler = CallbackHandler()
-
         self.setup_ui()
         self.start_error_monitoring()
 
@@ -157,8 +153,6 @@ class MainView:
         self.master.geometry('800x480')
         self.master.title("メイン画面")
         self.master.overrideredirect(True)
-
-        self.callback_handler.say_hello()
 
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -199,7 +193,7 @@ class MainView:
         self.stocker_frame = StockerApp(top_frame)
 
         # 下部フレーム（ボタン）
-        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data)
+        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data,self.send_input_start,self.send_input_stop)
 
         self.update_time()
         self.sirial_test()

@@ -9,13 +9,16 @@ from src.base.menteviews import MaintenanceView
 from ParamManager.ParamManager import ParamManager 
 
 class UnderButtonFrame:
-    def __init__(self, master, main_view, callback):
+    def __init__(self, master, main_view, callback,send_input_start,send_input_stop):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
         self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
         self.callback = callback
+
+        self.send_input_start = send_input_start
+        self.send_input_stop = send_input_stop
 
     def setup_buttons(self):
         # ボタンフレーム
@@ -144,9 +147,9 @@ class UnderButtonFrame:
       # 排出ボタンが押されたときの処理
 
     def open_maintenance_view(self):
- 
+        # メンテナンス画面を開く
         maintenance_window = ctk.CTkToplevel(self.master)
-        MaintenanceView(maintenance_window, self.on_maintenance_close)
+        MaintenanceView(maintenance_window, self.on_maintenance_close, self.send_input_start,self.send_input_stop)  # send_input_startをコールバックとして渡す
 
     def on_maintenance_close(self):
         # self.master.deiconify()
