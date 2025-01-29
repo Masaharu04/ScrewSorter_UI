@@ -28,7 +28,7 @@ class UnderButtonFrame:
         # ボタン用の画像を読み込む
         self.button_image = ctk.CTkImage(Image.open("img/settings.png"), size=(60, 60))
         self.poweroff_image = ctk.CTkImage(Image.open("img/poweroff.png"), size=(40, 40))
-        self.cycle_image = ctk.CTkImage(Image.open("img/cycle.png"), size=(60, 60))
+        self.clock_image = ctk.CTkImage(Image.open("img/clock.png"), size=(45, 45))
         self.discharge_image = ctk.CTkImage(Image.open("img/exsit.png"), size=(40, 40))
         self.export_image = ctk.CTkImage(Image.open("img/export.png"), size=(60, 60))
         self.maintenance_image = ctk.CTkImage(Image.open("img/maintenance.png"), size=(50, 50))
@@ -38,10 +38,10 @@ class UnderButtonFrame:
         self.buttons = [
             ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
-             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False)),
-            #("", "#3b8ed0", lambda: self.handle_button_click("", self.discharge_operation, True)),
+            ("時刻設定", "#3b8ed0", lambda: self.handle_button_click("時刻設定", self.discharge_operation, True)),
             ("エクスポート", "#1f6aa5", lambda: self.handle_button_click("エクスポート", export_button_action, True)),
-            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False))
+            ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False)),
+             ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
            
         ]
 
@@ -51,15 +51,7 @@ class UnderButtonFrame:
 
         self.create_buttons()
 
-    def open_setting_view(self):
-        # 設定画面を開く
-        setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
-        SettingViews(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
 
-    def on_setting_close(self):       
-        # self.master.deiconify()
-        self.master.pack()
-          # 元のウィンドウを再表示
     def callback_test(self,data):
         print("data")
         
@@ -98,7 +90,7 @@ class UnderButtonFrame:
             elif text == "シャットダウン": 
                 button_image = self.poweroff_image
             else:
-                 button_image = self.cycle_image
+                 button_image = self.clock_image
             
             # 画像ボタン
             image_button = ctk.CTkLabel(
@@ -154,3 +146,12 @@ class UnderButtonFrame:
     def on_maintenance_close(self):
         # self.master.deiconify()
         self.master.pack() 
+
+    def open_setting_view(self):
+        # 設定画面を開く
+        setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
+        SettingViews(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
+    
+    def on_setting_close(self):       
+        # self.master.deiconify()
+        self.master.pack()

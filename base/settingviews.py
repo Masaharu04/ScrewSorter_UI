@@ -3,6 +3,8 @@ from src.ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
 #from src.ui.stocker.stoker import create_stocker_frame
 from src.base.timesettingview import TimeSettingView
 
+from datetime import datetime
+
 class SettingViews:
     def __init__(self, master, on_close,callback_test, callback):
         self.master = master
@@ -10,8 +12,8 @@ class SettingViews:
         self.callback_test = callback_test
         self.selected_labels = [None] * 3  # 選択されたラベルを保持するリスト
         self.error_popup = ErrorPopup(master)  # エラーポップアップのインスタンスを作成
-        self.stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)", 
-                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(15mm)"] # ストッカーラベルをクラス属性として追加
+        self.stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(16mm)", 
+                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(16mm)"] # ストッカーラベルをクラス属性として追加
         self.selected_values = [0,0,0]  # 選択された値を保存するリストを追加
         self.setup_ui()
         self.callback = callback
@@ -43,16 +45,16 @@ class SettingViews:
 
     def _create_stocker_selection(self, parent):
         # ストッカー選択の作成
-        stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(15mm)", 
-                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(15mm)"]
+        stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(16mm)", 
+                          "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(16mm)"]
         
-        # 新しいボタンを追加
-        button_frame = ctk.CTkFrame(parent)  # ボタン用のフレームを作成
-        button_frame.pack(side="left", padx=10)  # 左側に配置
+        # # 新しいボタンを追加
+        # button_frame = ctk.CTkFrame(parent)  # ボタン用のフレームを作成
+        # button_frame.pack(side="left", padx=10)  # 左側に配置
         
-        # ボタンを作成
-        TransitionSetting_button = ctk.CTkButton(button_frame, text="ボタン", command=self.open_timeSettingView,width=14, height=150)  # サンプルボタンを縦長に設定
-        TransitionSetting_button.pack(pady=1)
+        # # ボタンを作成
+        # TransitionSetting_button = ctk.CTkButton(button_frame, text="ボタン", command=self.open_timeSettingView,width=14, height=150)  # サンプルボタンを縦長に設定
+        # TransitionSetting_button.pack(pady=1)
 
         for i in range(3):
             self.selected_labels[i] = ctk.StringVar(value=stocker_labels[0])
@@ -61,7 +63,7 @@ class SettingViews:
             ctk.CTkLabel(label_frame, text=f"{chr(65 + i)}:").pack(side="left")  # A, B, Cのラベル
             
             for index, label in enumerate(stocker_labels):
-                radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label, width=140, height=50)
+                radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label, width=168, height=50)
                 radio_button.pack(side="left", padx=5)
                 if (index + 1) % 4 == 0:
                     label_frame.pack()  # 新しい行を作成
@@ -130,11 +132,11 @@ class SettingViews:
     def open_timeSettingView(self):
         # サンプルボタンが押されたときの処理
         timesetting_window = ctk.CTkToplevel(self.master)
-        TimeSettingView(timesetting_window, on_close=self.on_timesetting_close)
+        TimeSettingView(timesetting_window,self.on_timesetting_close)
         print("時刻設定画面に遷移します")
 
     def on_timesetting_close(self):
-        self.master.pack()
+        self.master.destroy()
 
 
         

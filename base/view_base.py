@@ -1,6 +1,6 @@
 import customtkinter as ctk
 
-class TimeSettingView:
+class View_Base:
     def __init__(self, master, on_close):
         self.master = master
         self.on_close = on_close
