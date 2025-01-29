@@ -1,0 +1,99 @@
+import customtkinter as ctk
+from datetime import datetime
+import time
+
+class RTCSettingGUI:
+    def __init__(self):
+        self.root = ctk.CTk()
+        self.root.geometry("800x400")
+        self.root.title("RTC Setting Interface")
+        
+        # Configure grid
+        self.root.grid_columnconfigure((0,1,2,3,4,5), weight=1)
+        self.root.grid_rowconfigure((0,1,2), weight=1)
+        
+        # Current time values
+        now = datetime.now()
+        self.year = ctk.IntVar(value=now.year)
+        self.month = ctk.IntVar(value=now.month)
+        self.day = ctk.IntVar(value=now.day)
+        self.hour = ctk.IntVar(value=now.hour)
+        self.minute = ctk.IntVar(value=now.minute)
+        
+        # Create frames for each time component
+        self.create_time_component("年", self.year, 0, range(2000, 2100))
+        self.create_time_component("月", self.month, 1, range(1, 13))
+        self.create_time_component("日", self.day, 2, range(1, 32))
+       # self.create_separator(3)
+        self.create_time_component("時", self.hour, 4, range(0, 24))
+        self.create_time_component("分", self.minute, 5, range(0, 60))
+        
+        # Add Save and Cancel buttons
+        self.create_control_buttons()
+        
+    def create_time_component(self, label_text, var, col, value_range):
+        frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        frame.grid(row=1, column=col, padx=5, pady=5, sticky="nsew")
+        
+        # Up button
+        up_btn = ctk.CTkButton(frame, text="▲", 
+                              command=lambda: self.increment_value(var, value_range))
+        up_btn.pack(pady=5)
+        
+        # Value display
+        value_frame = ctk.CTkFrame(frame, fg_color="#E6E6FA")
+        value_frame.pack(pady=5, fill="x", padx=20)
+        value_label = ctk.CTkLabel(value_frame, textvariable=var,
+                                 font=("Arial", 24), text_color="black")
+        value_label.pack(pady=10)
+        
+        # Down button
+        down_btn = ctk.CTkButton(frame, text="▼",
+                                command=lambda: self.decrement_value(var, value_range))
+        down_btn.pack(pady=5)
+        
+        # Unit label
+        unit_label = ctk.CTkLabel(frame, text=label_text, font=("Arial", 16))
+        unit_label.pack(pady=5)
+        
+    def create_separator(self, col):
+        separator = ctk.CTkLabel(self.root, text="|", font=("Arial", 24))
+        separator.grid(row=1, column=col)
+        
+    def create_control_buttons(self):
+        button_frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        button_frame.grid(row=2, column=0, columnspan=6, pady=20)
+        
+        save_btn = ctk.CTkButton(button_frame, text="設定を保存",
+                                command=self.save_settings)
+        save_btn.pack(side="left", padx=10)
+        
+        cancel_btn = ctk.CTkButton(button_frame, text="キャンセル",
+                                  command=self.root.quit)
+        cancel_btn.pack(side="left", padx=10)
+        
+    def increment_value(self, var, value_range):
+        current = var.get()
+        next_value = current + 1
+        if next_value in value_range:
+            var.set(next_value)
+            
+    def decrement_value(self, var, value_range):
+        current = var.get()
+        next_value = current - 1
+        if next_value in value_range:
+            var.set(next_value)
+            
+    def save_settings(self):
+        # Here you would add the code to actually set the RTC
+        print(f"Setting RTC to: {self.year.get()}/{self.month.get()}/{self.day.get()} "
+              f"{self.hour.get()}:{self.minute.get()}")
+        # Add your RTC setting code here
+        self.root.quit()
+        
+    def run(self):
+        self.root.mainloop()
+
+if __name__ == "__main__":
+    app = RTCSettingGUI()
+    app.run()
