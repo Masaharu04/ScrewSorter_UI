@@ -6,14 +6,14 @@ import threading
 import queue
 import time
 #import serial
-from src.viewmodels import MainViewModel
-from src.base.menteviews import MaintenanceView  
-from src.ui.UnderButton.UnderButton import UnderButtonFrame
-from src.ui.EarPop.EarPopup import ErrorPopup
+from viewmodels import MainViewModel
+from base.menteviews import MaintenanceView  
+from ui.UnderButton.UnderButton import UnderButtonFrame
+from ui.EarPop.EarPopup import ErrorPopup
 from ..ui.stocker.stoker import StockerApp
-from src.ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeをインポート
-from src.ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
-from src.struct_command import *
+from ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeをインポート
+from ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
+from struct_command import *
 from ..struct_command import *
 
 
@@ -28,6 +28,9 @@ DISCRIMINATION_ADDR = 0x02
 RETURN_ADDR = 0x03
 ALIGNMENT_ADDR = 0x04
 MASTER_ADDR = 0x06 
+OUTPUT_ADDR = 0x08
+IMAGE_ADDR = 0x09
+
 
 STOKER_ADDE = 0x02
 POWER_OFF = 0x02
@@ -248,6 +251,43 @@ class MainView:
               data = self.receive_data_queue.get_nowait()
               self.p.set_protocol(data,structsize)
               command = data[1]
+
+              if command == CONNECTCHECKRESPONSE:
+                source_address = data[0] >> 4
+                if(source_address == INPUT_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+
+                if(source_address == DISCRIMINATION_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+
+                if(source_address == RETURN_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+
+                if(source_address == ALIGNMENT_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+
+                if(source_address == MASTER_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+
+                if(source_address == OUTPUT_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
+                   
+                if(source_address == IMAGE_ADDR):
+                    print("投入部接続完了")
+                else:
+                   print("接続確認ができませんでした")
             
               if command == INPUTSTOCKERSTATUS:
                 self.stocker_capacity = self.p.inputStockerStatus.capacity
@@ -328,11 +368,19 @@ class MainView:
         update_time(self.time_label, self.date_label)  # dateTime.pyのupdate_timeを呼び出す
 
     def start_error_monitoring(self):
+
         # エラーコードをチェックして、必要に応じてポップアップを表示
         error_code = self.viewmodel.get_error_code()  # ViewModelからエラーコードを取得
         if error_code:
             self.error_popup.show_error(error_code)
         self.master.after(1000, self.start_error_monitoring)  # 1秒ごとにチェック
+
+        command = CONNECTCHECK
+        address_send = make_address(MY_ADDR,INPUT_ADDR);
+        data_to_send = make_send_data(address_send,command);
+        self.send_data_queue.put(data_to_send)
+
+
 
   #シリアル通信送信コマンド
     def send_rebaseInfo(self):

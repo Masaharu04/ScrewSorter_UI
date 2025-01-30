@@ -1,9 +1,10 @@
 import customtkinter as ctk
 from base.menteviews import MaintenanceView
 class MaintenanceMainView:
-    def __init__(self, master, on_close):
+    def __init__(self, master, on_close, motervalue):
         self.master = master
         self.on_close = on_close
+        self.motervalue = motervalue
         
         # カスタムカラーの定義
         self.colors = {
@@ -15,7 +16,7 @@ class MaintenanceMainView:
             "panel": "#2D2D2D"          # パネル背景
         }
         
-        self.values = [4, 4, 4]  # 数値制御の初期値
+        self.values = self.motervalue#[4, 4, 4]  # 数値制御の初期値
         
         self.setup_ui()
         self.master.config(cursor="")
@@ -190,7 +191,7 @@ class MaintenanceMainView:
         ).pack(side='bottom', pady=10)
 
     def adjust_value(self, index, delta):
-        self.values[index] = max(0, min(9, self.values[index] + delta))
+        self.values[index] = max(1, min(10, self.values[index] + delta))
         getattr(self, f'value_label_{index}').configure(text=str(self.values[index]))
 
     def timesetting_close(self):

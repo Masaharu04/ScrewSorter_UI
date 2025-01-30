@@ -22,6 +22,8 @@ class UnderButtonFrame:
         self.send_input_start = send_input_start
         self.send_input_stop = send_input_stop
 
+        self.motervalue = [4,6,4]
+
     def setup_buttons(self):
         # ボタンフレーム
         self.button_frame = ctk.CTkFrame(self.master, fg_color="#2b2b2b")
@@ -136,14 +138,14 @@ class UnderButtonFrame:
         print("一連動作ボタンが押されました")  # 一連動作ボタンが押されたときの処理
 
     def discharge_operation(self):
-        from src.base.views import MainView 
+        from base.views import MainView 
         self.main_view.send_rebaseInfo()  # MainViewのsend_rebaseInfoを呼び出す
       # 排出ボタンが押されたときの処理
 
     def open_maintenance_view(self):
         # メンテナンス画面を開く
         maintenance_window = ctk.CTkToplevel(self.master)
-        MaintenanceMainView(maintenance_window, self.on_maintenance_close)  # send_input_startをコールバックとして渡す
+        MaintenanceMainView(maintenance_window, self.on_maintenance_close,self.motervalue)  # send_input_startをコールバックとして渡す
 
     def on_maintenance_close(self):
         # self.master.deiconify()
