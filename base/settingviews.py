@@ -14,7 +14,7 @@ class SettingViews:
         self.error_popup = ErrorPopup(master)  # エラーポップアップのインスタンスを作成
         self.stocker_labels = ["ボルトM5(8mm)", "ボルトM5(10mm)", "ボルトM5(12mm)","ボルトM5(16mm)", 
                           "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(16mm)"] # ストッカーラベルをクラス属性として追加
-        self.selected_values = [0,0,0]  # 選択された値を保存するリストを追加
+        #self.selected_values = [0,0,0]  # 選択された値を保存するリストを追加
         self.setup_ui()
         self.callback = callback
 

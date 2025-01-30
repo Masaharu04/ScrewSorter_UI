@@ -5,6 +5,7 @@ import customtkinter as ctk
 import threading
 import queue
 import time
+import datetime
 #import serial
 from viewmodels import MainViewModel
 from base.menteviews import MaintenanceView  
@@ -15,7 +16,17 @@ from ui.dateTime.dateTime import update_time  # dateTime.pyのupdate_timeをイ�
 from ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInputAmountFrameをインポート
 from struct_command import *
 from ..struct_command import *
+from CsvClass import CsvControl
 
+AAAAAAAAAAA = 'src/'
+DIR_PATH = AAAAAAAAAAA + 'testdata/'
+USB_DIR_PATH = AAAAAAAAAAA + 'outputdata/'
+DISCRIMINATION_RESULTS_FILE_PATH = DIR_PATH + 'discrimination_results.csv'
+DATA2_FILE_PATH = DIR_PATH + 'data2.csv'
+DATA3_FILE_PATH = DIR_PATH + 'data3.csv'
+DISCRIMINATION_RESULTS_HEADER = ['Time', 'Thickness', 'length']
+DATA2_HEADER = ['Time', 'M5*8', 'M5*10', 'M5*12', 'M5*16', 'M6*8', 'M6*10', 'M6*12', 'M6*16', 'return', 'etc']
+DATA3_HEADER = DATA2_HEADER
 
 
 SERIAL_PORT = '/dev/ttyS0'
@@ -146,8 +157,14 @@ class MainView:
         self.viewmodel = MainViewModel()
         self.error_popup = ErrorPopup(master)
         self.error_popup.set_viewmodel(self.viewmodel)
+        now = datetime.datetime.now()
+        format_now = now.strftime("%Y/%m/%d/%H/%M")
+        self.csv_test = CsvControl(format_now, DIR_PATH, USB_DIR_PATH, DISCRIMINATION_RESULTS_FILE_PATH, DATA2_FILE_PATH, DATA3_FILE_PATH
+                   , DISCRIMINATION_RESULTS_HEADER, DATA2_HEADER, DATA3_HEADER)
         self.setup_ui()
         self.start_error_monitoring()
+
+        
 
         # カーソルを非表示にする
         self.master.config(cursor="")
@@ -198,7 +215,7 @@ class MainView:
         self.stocker_frame = StockerApp(top_frame)
 
         # 下部フレーム（ボタン）
-        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data,self.send_input_start,self.send_input_stop)
+        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data,self.send_input_start,self.send_input_stop,self.csv_test.request_output_csv)
 
         self.update_time()
         self.sirial_test()
@@ -248,6 +265,9 @@ class MainView:
     def check_queue(self):
           try:
             while True:
+              now = datetime.datetime.now()
+              format_now = now.strftime("%Y/%m/%d/%H/%M")
+              self.csv_test.csv_controller(format_now)
               data = self.receive_data_queue.get_nowait()
               self.p.set_protocol(data,structsize)
               command = data[1]
@@ -283,7 +303,7 @@ class MainView:
                     print("投入部接続完了")
                 else:
                    print("接続確認ができませんでした")
-                   
+
                 if(source_address == IMAGE_ADDR):
                     print("投入部接続完了")
                 else:

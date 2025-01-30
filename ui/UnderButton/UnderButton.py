@@ -11,7 +11,7 @@ from ParamManager.ParamManager import ParamManager
 from base.timesettingview import TimeSettingView
 
 class UnderButtonFrame:
-    def __init__(self, master, main_view, callback,send_input_start,send_input_stop):
+    def __init__(self, master, main_view, callback,send_input_start,send_input_stop,request_output_csv):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
@@ -21,6 +21,7 @@ class UnderButtonFrame:
         
         self.send_input_start = send_input_start
         self.send_input_stop = send_input_stop
+        self.request_output_csv = request_output_csv
 
         self.motervalue = [4,6,4]
 
@@ -146,7 +147,8 @@ class UnderButtonFrame:
         # メンテナンス画面を開く
         maintenance_window = ctk.CTkToplevel(self.master)
         MaintenanceMainView(maintenance_window, self.on_maintenance_close,self.motervalue)  # send_input_startをコールバックとして渡す
-
+        print("llllllllllllllllllll")       
+        print(self.motervalue)
     def on_maintenance_close(self):
         # self.master.deiconify()
         self.master.pack() 
