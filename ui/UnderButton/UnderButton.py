@@ -2,11 +2,13 @@ import customtkinter as ctk
 from PIL import Image
 import threading
 import time
-from src.ui.export.export import export_button_action
-from src.ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
-from src.base.settingviews import SettingViews  # MaintenanceViewをインポート
-from src.base.menteviews import MaintenanceView
+from ui.export.export import export_button_action
+from ui.Shutdown.Shutdown import ShutdownPopup  # ShutdownPopupクラスをインポート
+from base.settingviews import SettingViews  # MaintenanceViewをインポート
+from base.menteviews import MaintenanceView
+from base.mentemainview import MaintenanceMainView
 from ParamManager.ParamManager import ParamManager 
+from base.timesettingview import TimeSettingView
 
 class UnderButtonFrame:
     def __init__(self, master, main_view, callback,send_input_start,send_input_stop):
@@ -16,7 +18,7 @@ class UnderButtonFrame:
         self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
         self.callback = callback
-
+        
         self.send_input_start = send_input_start
         self.send_input_stop = send_input_stop
 
@@ -38,7 +40,7 @@ class UnderButtonFrame:
         self.buttons = [
             ("設定", "#3b8ed0", lambda: self.handle_button_click("設定", self.open_setting_view, False)),
             ("排出", "#3b8ed0", lambda: self.handle_button_click("排出", self.discharge_operation, True)),
-            ("時刻設定", "#3b8ed0", lambda: self.handle_button_click("時刻設定", self.discharge_operation, True)),
+            ("時刻設定", "#3b8ed0", lambda: self.handle_button_click("時刻設定", self.open_timesetting_view, True)),
             ("エクスポート", "#1f6aa5", lambda: self.handle_button_click("エクスポート", export_button_action, True)),
             ("メンテナンス", "#1f6aa5", lambda: self.handle_button_click("メンテナンス", self.open_maintenance_view, False)),
              ("シャットダウン", "#FF5216", lambda: self.handle_button_click("シャットダウン", self.open_shutdown_confirmation, False))
@@ -53,7 +55,7 @@ class UnderButtonFrame:
 
 
     def callback_test(self,data):
-        print("data")
+        print("data...........................")
         
     def handle_button_click(self, button_name, command, use_timer):
         if self.button_enabled[button_name]:
@@ -141,7 +143,7 @@ class UnderButtonFrame:
     def open_maintenance_view(self):
         # メンテナンス画面を開く
         maintenance_window = ctk.CTkToplevel(self.master)
-        MaintenanceView(maintenance_window, self.on_maintenance_close, self.send_input_start,self.send_input_stop)  # send_input_startをコールバックとして渡す
+        MaintenanceMainView(maintenance_window, self.on_maintenance_close)  # send_input_startをコールバックとして渡す
 
     def on_maintenance_close(self):
         # self.master.deiconify()
@@ -151,7 +153,11 @@ class UnderButtonFrame:
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
         SettingViews(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
-    
+
+    def open_timesetting_view(self):
+        timeSetting_window = ctk.CTkToplevel(self.master)
+        TimeSettingView(timeSetting_window, self.on_setting_close)
+
     def on_setting_close(self):       
         # self.master.deiconify()
         self.master.pack()

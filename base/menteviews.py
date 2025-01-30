@@ -1,12 +1,9 @@
 import customtkinter as ctk
 
 class MaintenanceView:
-    def __init__(self, master, on_close,send_input_start,send_input_stop):
+    def __init__(self, master, on_close):
         self.master = master
         self.on_close = on_close
-
-        self.send_input_start = send_input_start
-        self.send_input_stop = send_input_stop
         
         self.setup_ui()
 
@@ -132,19 +129,19 @@ class MaintenanceView:
 
     def close_maintenance_view(self):
         self.master.destroy()
-        self.on_close()
+        # self.on_close()
 
-    def input_start(self):
-        self.send_input_start()
-        # from src.base.views import MainView 
-        # main_view = MainView(self.master)
-        # main_view.send_input_start()
+    # def input_start(self):
+    #     self.send_input_start()
+    #     # from src.base.views import MainView 
+    #     # main_view = MainView(self.master)
+    #     # main_view.send_input_start()
         
-    def input_stop(self):
-        self.send_input_stop()
-        # from src.base.views import MainView 
-        # main_view = MainView(self.master)
-        # main_view.send_input_stop()
+    # def input_stop(self):
+    #     self.send_input_stop()
+    #     # from src.base.views import MainView 
+    #     # main_view = MainView(self.master)
+    #     # main_view.send_input_stop()
 
     def discrimination_start(self):
         from src.base.views import MainView 

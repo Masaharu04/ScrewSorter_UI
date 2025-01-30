@@ -51,6 +51,8 @@ class TimeSettingView:
 
     def _create_return_button(self, parent):
         # 戻るボタンの作成
-        return_button = ctk.CTkButton(parent, text="戻る", command=self.on_close)
+        return_button = ctk.CTkButton(parent, text="戻る", command=self.timesetting_close)
         return_button.pack(side='bottom', pady=10)
 
+    def timesetting_close(self):        
+        self.master.destroy() 

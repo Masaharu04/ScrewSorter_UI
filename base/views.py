@@ -1,8 +1,11 @@
 import customtkinter as ctk
+#import tkinter.messagebox as messagebox
+#from datetime import datetime
+#from PIL import Image
 import threading
 import queue
 import time
-import serial
+#import serial
 from src.viewmodels import MainViewModel
 from src.base.menteviews import MaintenanceView  
 from src.ui.UnderButton.UnderButton import UnderButtonFrame
@@ -46,11 +49,11 @@ class SerialThread:
     self.send_data_queue = send_data_queue
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
-    try:
-     self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    except serial.SerialException as e:
-     print(f"シリアルポートの初期化に失敗しました: {e}")
-     self.ser = None
+    #try:
+    #  self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    #except serial.SerialException as e:
+    #  print(f"シリアルポートの初期化に失敗しました: {e}")
+    #  self.ser = None
 
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -100,14 +103,14 @@ class SerialThread:
           i=0
         time.sleep(0.5)
 
-        try:
-            data_to_send = self.send_data_queue.get_nowait()
-            self.ser.write(data_to_send)
-            
-        except queue.Empty:
-            pass
-        finally:
-            time.sleep(0.5)
+      try:
+          #data_to_send = self.send_data_queue.get_nowait()
+          #self.ser.write(data_to_send)
+          
+     # except queue.Empty:
+          pass
+      finally:
+          time.sleep(0.5)
 
 def decimalToBinaryList(num: int):
     binary_representation = bin(num)[2:]

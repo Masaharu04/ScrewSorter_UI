@@ -1,7 +1,7 @@
 import customtkinter as ctk
-from src.ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
+from ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
 #from src.ui.stocker.stoker import create_stocker_frame
-from src.base.timesettingview import TimeSettingView
+
 
 from datetime import datetime
 
@@ -64,7 +64,7 @@ class SettingViews:
             
             for index, label in enumerate(stocker_labels):
                 radio_button = ctk.CTkRadioButton(label_frame, text=label, variable=self.selected_labels[i], value=label, width=168, height=50)
-                radio_button.pack(side="left", padx=5)
+                radio_button.pack(side="left", padx=5, pady=2)
                 if (index + 1) % 4 == 0:
                     label_frame.pack()  # 新しい行を作成
                     label_frame = ctk.CTkFrame(parent)  # 新しいフレームを作成
@@ -75,12 +75,12 @@ class SettingViews:
         buttons_frame.pack(fill='x', pady=5)
 
         # 戻るボタン
-        close_button = ctk.CTkButton(buttons_frame, text="戻る", command=self.close_maintenance_view,font=("Meiryo", 20, "bold"), width=200, height=60)
-        close_button.pack(side='left')
+        close_button = ctk.CTkButton(buttons_frame, text="戻る", command=self.close_setting_view,font=("Meiryo", 20, "bold"), width=200, height=60)
+        close_button.pack(side='left',padx=(10, 10))
 
         # 選択したストッカーを表示するボタン
         confirm_button = ctk.CTkButton(buttons_frame, text="選択を確認", command=self.confirm_selection,font=("Meiryo", 20, "bold"), width=200, height=60)
-        confirm_button.pack(side='left', padx=(10, 0))
+        confirm_button.pack(side='left', padx=(10, 10))
 
     def confirm_selection(self):
         # 選択されたストッカーを表示
@@ -90,17 +90,12 @@ class SettingViews:
         if len(self.selected_values) != len(set(self.selected_values)):
             self.error_popup.show_error("E001")  # エラーコードを指定してポップアップを表示
             return
-        
+        self.send_sirial()
+        self.callback(self.selected_values)
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
 
-    def close_maintenance_view(self):
-        self.send_sirial()
+    def close_setting_view(self):        
         self.master.destroy() 
-        self.callback_test(1)
-        self.callback(self.selected_values)
-        #print(self.selected_values)
-
-        return self.selected_values
     
     def send_sirial(self):
 
@@ -129,14 +124,14 @@ class SettingViews:
         main_view = MainView(self.master)
         main_view.send_stocker(new_array)
 
-    def open_timeSettingView(self):
-        # サンプルボタンが押されたときの処理
-        timesetting_window = ctk.CTkToplevel(self.master)
-        TimeSettingView(timesetting_window,self.on_timesetting_close)
-        print("時刻設定画面に遷移します")
+    # def open_timeSettingView(self):
+    #     # サンプルボタンが押されたときの処理
+    #     timesetting_window = ctk.CTkToplevel(self.master)
+    #     TimeSettingView(timesetting_window,self.on_timesetting_close)
+    #     print("時刻設定画面に遷移します")
 
-    def on_timesetting_close(self):
-        self.master.destroy()
+    # def on_timesetting_close(self):
+    #     self.master.destroy()
 
 
         
