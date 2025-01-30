@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from datetime import datetime
 
 class TimeSettingView:
     def __init__(self, master, on_close):
@@ -7,52 +8,79 @@ class TimeSettingView:
         self.setup_ui()
 
     def setup_ui(self):
-        # UIの各要素を順番にセットアップ
         self._setup_window()
         main_frame = self._create_main_frame()
-        self._create_time_setting_widgets(main_frame)  # 時刻設定用のウィジェットを追加
-        self._create_return_button(main_frame)  # 戻るボタンを追加
+        self._create_time_setting_widgets(main_frame)
+        self._create_buttons(main_frame)
 
     def _setup_window(self):
-        # ウィンドウの基本設定
         self.master.title("メンテナンス画面")
         self.master.geometry('800x480')
-        self.master.overrideredirect(True)  # タイトルバーを非表示
+        self.master.overrideredirect(True)
 
     def _create_main_frame(self):
-        # メインフレームの作成
         main_frame = ctk.CTkFrame(self.master)
-        main_frame.pack(expand=True, fill='both', padx=10, pady=10)
+        main_frame.pack(expand=True, fill='both', padx=20, pady=20)
         return main_frame
 
     def _create_time_setting_widgets(self, parent):
-        # 時刻設定用のウィジェットを作成
         time_frame = ctk.CTkFrame(parent)
         time_frame.pack(expand=True, fill='both', pady=20)
-
-
-
-    def _create_time_widget(self, parent, var, label_text, max_value):
-        # 時間ウィジェットの作成
+        
+        now = datetime.now()
+        self.year = ctk.IntVar(value=now.year)
+        self.month = ctk.IntVar(value=now.month)
+        self.day = ctk.IntVar(value=now.day)
+        self.hour = ctk.IntVar(value=now.hour)
+        self.minute = ctk.IntVar(value=now.minute)
+        
+        self._create_time_widget(time_frame, self.year, "年", range(2000, 2100))
+        self._create_time_widget(time_frame, self.month, "月", range(1, 13))
+        self._create_time_widget(time_frame, self.day, "日", range(1, 32))
+        self._create_time_widget(time_frame, self.hour, "時", range(0, 24))
+        self._create_time_widget(time_frame, self.minute, "分", range(0, 60))
+    
+    def _create_time_widget(self, parent, var, label_text, value_range):
         widget_frame = ctk.CTkFrame(parent)
-        widget_frame.pack(side='left', padx=15, pady=5)
-
-        label = ctk.CTkLabel(widget_frame, text=label_text)
+        widget_frame.pack(side='left', padx=25, pady=20)
+        
+        label = ctk.CTkLabel(widget_frame, text=label_text, font=("Arial", 32))
         label.pack()
-
-        up_button = ctk.CTkButton(widget_frame, text="▲", command=lambda: self._increment_time(var, max_value), width=30)
+        
+        up_button = ctk.CTkButton(widget_frame, text="▲", command=lambda: self._increment_time(var, value_range), width=80, height=80)
         up_button.pack()
-
-        display = ctk.CTkLabel(widget_frame, textvariable=var, width=30)
+        
+        display = ctk.CTkLabel(widget_frame, textvariable=var, width=80, font=("Arial", 32))
         display.pack()
-
-        down_button = ctk.CTkButton(widget_frame, text="▼", command=lambda: self._decrement_time(var, max_value), width=30)
+        
+        down_button = ctk.CTkButton(widget_frame, text="▼", command=lambda: self._decrement_time(var, value_range), width=80, height=80)
         down_button.pack()
+    
+    def _increment_time(self, var, value_range):
+        current = var.get()
+        next_value = current + 1
+        if next_value in value_range:
+            var.set(next_value)
 
-    def _create_return_button(self, parent):
-        # 戻るボタンの作成
-        return_button = ctk.CTkButton(parent, text="戻る", command=self.timesetting_close)
-        return_button.pack(side='bottom', pady=10)
+    def _decrement_time(self, var, value_range):
+        current = var.get()
+        next_value = current - 1
+        if next_value in value_range:
+            var.set(next_value)
+    
+    def save_settings(self):
+        print(f"設定されたRTC時刻: {self.year.get()}/{self.month.get()}/{self.day.get()} {self.hour.get()}:{self.minute.get()}")
+        # RTC 設定用のコードをここに追加
+
+    def _create_buttons(self, parent):
+        button_frame = ctk.CTkFrame(parent)
+        button_frame.pack(side='bottom', pady=20)
+        
+        save_button = ctk.CTkButton(button_frame, text="設定を保存", command=self.save_settings, height=80, width=300, font=("Arial", 24))
+        save_button.pack(side='left', padx=20)
+        
+        return_button = ctk.CTkButton(button_frame, text="戻る", command=self.timesetting_close, height=80, width=300, font=("Arial", 24))
+        return_button.pack(side='right', padx=20)
 
     def timesetting_close(self):        
-        self.master.destroy() 
+        self.master.destroy()
