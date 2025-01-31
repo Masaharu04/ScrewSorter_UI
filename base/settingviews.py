@@ -90,7 +90,7 @@ class SettingViews:
         if len(self.selected_values) != len(set(self.selected_values)):
             self.error_popup.show_error("E001")  # エラーコードを指定してポップアップを表示
             return
-        self.send_sirial()
+        #self.send_sirial()
         self.callback(self.selected_values)
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
 

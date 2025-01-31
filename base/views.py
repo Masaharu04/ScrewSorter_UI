@@ -18,7 +18,7 @@ from struct_command import *
 from ..struct_command import *
 from CsvClass import CsvControl
 
-AAAAAAAAAAA = 'src/'
+AAAAAAAAAAA = 'csv_data/'
 DIR_PATH = AAAAAAAAAAA + 'testdata/'
 USB_DIR_PATH = AAAAAAAAAAA + 'outputdata/'
 DISCRIMINATION_RESULTS_FILE_PATH = DIR_PATH + 'discrimination_results.csv'
@@ -48,7 +48,7 @@ POWER_OFF = 0x02
 
 
 addrList = [
-    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR,STOKER_ADDE,POWER_OFF
+    INPUT_ADDR,DISCRIMINATION_ADDR,RETURN_ADDR,ALIGNMENT_ADDR,MASTER_ADDR,OUTPUT_ADDR,IMAGE_ADDR
 ]
 
 
@@ -161,13 +161,20 @@ class MainView:
         format_now = now.strftime("%Y/%m/%d/%H/%M")
         self.csv_test = CsvControl(format_now, DIR_PATH, USB_DIR_PATH, DISCRIMINATION_RESULTS_FILE_PATH, DATA2_FILE_PATH, DATA3_FILE_PATH
                    , DISCRIMINATION_RESULTS_HEADER, DATA2_HEADER, DATA3_HEADER)
-        self.setup_ui()
-        self.start_error_monitoring()
 
+
+        # 確認対象のモジュールアドレス
+        self.MODULE_ADDRESSES = [
+            INPUT_ADDR, DISCRIMINATION_ADDR, RETURN_ADDR, ALIGNMENT_ADDR, MASTER_ADDR
+        ]
+        self.received_flags = {addr: False for addr in self.MODULE_ADDRESSES}
         
-
+        #self.send_check_commands()
         # カーソルを非表示にする
         self.master.config(cursor="")
+        
+        self.setup_ui()
+        self.start_error_monitoring()
 
         print("初期動作完了")
 
@@ -220,6 +227,8 @@ class MainView:
         self.update_time()
         self.sirial_test()
         
+       
+        
         print("初期動作完了")
 
 
@@ -268,9 +277,17 @@ class MainView:
               now = datetime.datetime.now()
               format_now = now.strftime("%Y/%m/%d/%H/%M")
               self.csv_test.csv_controller(format_now)
+              
               data = self.receive_data_queue.get_nowait()
               self.p.set_protocol(data,structsize)
               command = data[1]
+              
+                  
+            #   for addr in self.MODULE_ADDRESSES:
+            #    if not self.received_flags[addr]:
+            #     print(f"モジュール {hex(addr)} の接続確認を開始")  
+            #     #self.send_check_commands()
+            #     #self.wait_for_responses()
 
               if command == CONNECTCHECKRESPONSE:
                 source_address = data[0] >> 4
@@ -365,7 +382,53 @@ class MainView:
               pass
           finally:
               self.master.after(100, self.check_queue)
-    
+              
+    def send_check_commands(self):
+        """ 各モジュールに接続確認コマンドを送信 """
+        for addr in self.MODULE_ADDRESSES:
+            command = CONNECTCHECK
+            address_send = make_address(MY_ADDR, addr)
+            data_to_send = make_send_data(address_send, command)
+            self.send_data_queue.put(data_to_send)
+            print(f"送信: {data_to_send}")
+            
+    def wait_for_responses(self, timeout=5):
+        """ 応答を5秒間待機し、接続確認を行う """
+        start_time = time.time()
+        received_addresses = set()
+
+        while time.time() - start_time < timeout:
+            try:
+                # 受信データを取得（最大0.5秒待つ）
+                data = self.receive_data_queue.get(timeout=0.5)
+                command = data[1]
+                source_address = data[0] >> 4
+
+                if command == CONNECTCHECKRESPONSE and source_address in self.MODULE_ADDRESSES:
+                    self.received_flags[source_address] = True  # 応答を受け取ったモジュールをマーク
+                    received_addresses.add(source_address)
+                    print(f"モジュール {hex(source_address)} 接続完了")
+
+                # すべてのモジュールから応答を受け取ったら終了
+                if len(received_addresses) == len(self.MODULE_ADDRESSES):
+                    print("全モジュール接続確認完了")
+                    self.response_received = True  # 応答を受信したことを記録
+                    return True
+
+            except queue.Empty:
+                continue  # タイムアウトまで待機
+
+        # 応答がなかったモジュールのエラー処理
+        missing_addresses = [addr for addr, received in self.received_flags.items() if not received]
+        if missing_addresses:
+            print(f"エラー: 接続確認ができなかったモジュール {', '.join(hex(addr) for addr in missing_addresses)}")
+            self.show_error_popup("E001")
+
+        self.response_received = True  # 応答を受信したことを記録
+        return False
+    def show_error_popup(self, error_code):
+        """ エラーポップを表示する（仮のprint出力）"""
+        print(f"[ERROR] {error_code}: 接続確認エラーが発生しました")
 
     def create_amount_display(self, parent_frame):
         # 投入量表示フレームを作成し、単色の背景を追加
@@ -399,8 +462,8 @@ class MainView:
         address_send = make_address(MY_ADDR,INPUT_ADDR);
         data_to_send = make_send_data(address_send,command);
         self.send_data_queue.put(data_to_send)
-
-
+        
+        
 
   #シリアル通信送信コマンド
     def send_rebaseInfo(self):
