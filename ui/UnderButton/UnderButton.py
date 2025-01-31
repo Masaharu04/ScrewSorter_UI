@@ -11,13 +11,13 @@ from ParamManager.ParamManager import ParamManager
 from base.timesettingview import TimeSettingView
 
 class UnderButtonFrame:
-    def __init__(self, master, main_view, callback,send_input_start,send_input_stop,request_output_csv):
+    def __init__(self, master, main_view, stocker_data_buf,send_input_start,send_input_stop,request_output_csv):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
         self.shutdown_popup = ShutdownPopup(master)  # ShutdownPopupのインスタンスを作成
         self.setup_buttons()
-        self.callback = callback
+        self.stocker_data_buf = stocker_data_buf
         
         self.send_input_start = send_input_start
         self.send_input_stop = send_input_stop
@@ -156,7 +156,7 @@ class UnderButtonFrame:
     def open_setting_view(self):
         # 設定画面を開く
         setting_window = ctk.CTkToplevel(self.master)  # CTkウィンドウを作成
-        SettingViews(setting_window, self.on_setting_close,self.callback_test, self.callback)  # MaintenanceViewを開く
+        SettingViews(setting_window, self.on_setting_close,self.callback_test, self.stocker_data_buf)  # MaintenanceViewを開く
 
     def open_timesetting_view(self):
         timeSetting_window = ctk.CTkToplevel(self.master)

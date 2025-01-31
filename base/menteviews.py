@@ -1,10 +1,10 @@
 import customtkinter as ctk
-
+from send_data import SendModuleOperation
 class MaintenanceView:
     def __init__(self, master, on_close):
         self.master = master
         self.on_close = on_close
-        
+        self.send_module_operation = SendModuleOperation()
         self.setup_ui()
 
         # カーソルを非表示にする
@@ -129,19 +129,19 @@ class MaintenanceView:
 
     def close_maintenance_view(self):
         self.master.destroy()
-        # self.on_close()
+        self.on_close()
 
-    # def input_start(self):
-    #     self.send_input_start()
-    #     # from src.base.views import MainView 
-    #     # main_view = MainView(self.master)
-    #     # main_view.send_input_start()
+    def input_start(self):
+        self.send_module_operation.send_input_module_start()
+        # from src.base.views import MainView 
+        # main_view = MainView(self.master)
+        # main_view.send_input_start()
         
-    # def input_stop(self):
-    #     self.send_input_stop()
-    #     # from src.base.views import MainView 
-    #     # main_view = MainView(self.master)
-    #     # main_view.send_input_stop()
+    def input_stop(self):
+        self.send_input_stop()
+        # from src.base.views import MainView 
+        # main_view = MainView(self.master)
+        # main_view.send_input_stop()
 
     def discrimination_start(self):
         from src.base.views import MainView 

@@ -17,6 +17,7 @@ from ui.InputAmount.InputAmount import InputAmountFrame  # InputAmount.pyのInpu
 from struct_command import *
 from ..struct_command import *
 from CsvClass import CsvControl
+from base import config
 
 AAAAAAAAAAA = 'csv_data/'
 DIR_PATH = AAAAAAAAAAA + 'testdata/'
@@ -118,10 +119,12 @@ class SerialThread:
         time.sleep(0.5)
 
       try:
-          #data_to_send = self.send_data_queue.get_nowait()
+          data_to_send = self.send_data_queue.get_nowait()
+          print("//////////send//////////")
+          print(data_to_send)
           #self.ser.write(data_to_send)
           
-     # except queue.Empty:
+      except queue.Empty:
           pass
       finally:
           time.sleep(0.5)
@@ -150,7 +153,6 @@ def make_send_data(address_send,command,data1=0,data2=0,data3=0):
    send_data = bytearray([address_send,command,data1,data2,data3])
    return send_data
 
-
 class MainView:
     def __init__(self, master):
         self.master = master
@@ -172,6 +174,7 @@ class MainView:
         #self.send_check_commands()
         # カーソルを非表示にする
         self.master.config(cursor="")
+        self.stocker_data_buf = [0,0,0]
         
         self.setup_ui()
         self.start_error_monitoring()
@@ -200,9 +203,13 @@ class MainView:
 
         #シリアル通信テスト
         self.p = Protocol()
+        ####################################################################  
         #キューの初期化
-        self.receive_data_queue = queue.Queue()
-        self.send_data_queue = queue.Queue()
+        # self.receive_data_queue = queue.Queue()
+        # self.send_data_queue = queue.Queue()
+        self.receive_data_queue = config.receive_data_queue
+        self.send_data_queue = config.send_data_queue
+        #################################################################### 
         self.thread = SerialThread(self.receive_data_queue, self.send_data_queue)
 
         # 時間表示
@@ -220,18 +227,26 @@ class MainView:
         
         # 中間ストッカーの残量
         self.stocker_frame = StockerApp(top_frame)
+        
+        self.stocker_data_buf.append(ctk.IntVar())
+        self.stocker_data_buf[3].set(0)
+        self.stocker_data_buf[3].trace_add("write", self.stocker_callback)
 
         # 下部フレーム（ボタン）
-        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_frame.set_data,self.send_input_start,self.send_input_stop,self.csv_test.request_output_csv)
+        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_data_buf,self.send_input_start,self.send_input_stop,self.csv_test.request_output_csv)
 
         self.update_time()
         self.sirial_test()
         
-       
-        
         print("初期動作完了")
-
-
+    
+    def stocker_callback(self, *arg):
+        print("aaaaaaaaaa")
+        buf = [0,0,0]
+        for i in range(0,3):
+            buf[i] = self.stocker_data_buf[i]
+        self.stocker_frame.set_data(buf)
+        
     def sirial_test(self):
           photoA_low = 0
           photoA_mid = 1
@@ -282,6 +297,16 @@ class MainView:
               self.p.set_protocol(data,structsize)
               command = data[1]
               
+              if command == DISCRIMINATIONRESULT:
+                if data[2] in [0x01, 0x02, 0x03]:
+                    print("A")
+                elif source_address == 0x04:
+                   # csv_data = [時刻, 0, 0]
+                  #  self.csv_test.add_a_line_of_csv_data(DISCRIMINATION_RESULTS_FILE_PATH, csv_data)
+                    
+                    print("B")
+                else:
+                    print("C")
                   
             #   for addr in self.MODULE_ADDRESSES:
             #    if not self.received_flags[addr]:
@@ -326,11 +351,12 @@ class MainView:
                 else:
                    print("接続確認ができませんでした")
             
-              if command == INPUTSTOCKERSTATUS:
-                self.stocker_capacity = self.p.inputStockerStatus.capacity
-                self.update_amount_display(self.amount_label,self.stocker_capacity)
+            #   if command == INPUTSTOCKERSTATUS:
+            #     self.stocker_capacity = self.p.inputStockerStatus.capacity
+            #     self.update_amount_display(self.amount_label,self.stocker_capacity)
 
-              elif command == SENSORINFO:
+            #   el
+              if command == SENSORINFO:
                 data1 = decimalToBinaryList(self.p.s.SensorInfo.data1)
                 data2 = decimalToBinaryList(self.p.s.SensorInfo.data2)
                 source_address = data[0] >> 4
@@ -426,6 +452,7 @@ class MainView:
 
         self.response_received = True  # 応答を受信したことを記録
         return False
+   
     def show_error_popup(self, error_code):
         """ エラーポップを表示する（仮のprint出力）"""
         print(f"[ERROR] {error_code}: 接続確認エラーが発生しました")
@@ -461,8 +488,9 @@ class MainView:
         command = CONNECTCHECK
         address_send = make_address(MY_ADDR,INPUT_ADDR);
         data_to_send = make_send_data(address_send,command);
-        self.send_data_queue.put(data_to_send)
+        # self.send_data_queue.put(data_to_send)#エラーコマンドリクエスト
         
+    
         
 
   #シリアル通信送信コマンド

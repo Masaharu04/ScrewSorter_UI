@@ -6,7 +6,7 @@ from ui.EarPop.EarPopup import ErrorPopup  # ErrorPopupをインポート
 from datetime import datetime
 
 class SettingViews:
-    def __init__(self, master, on_close,callback_test, callback):
+    def __init__(self, master, on_close,callback_test, stocker_data_buf):
         self.master = master
         self.on_close = on_close
         self.callback_test = callback_test
@@ -16,7 +16,7 @@ class SettingViews:
                           "ボルトM6(8mm)", "ボルトM6(10mm)", "ボルトM6(12mm)", "ボルトM6(16mm)"] # ストッカーラベルをクラス属性として追加
         #self.selected_values = [0,0,0]  # 選択された値を保存するリストを追加
         self.setup_ui()
-        self.callback = callback
+        self.stocker_data_buf = stocker_data_buf
 
     def setup_ui(self):
         # UIの各要素を順番にセットアップ
@@ -90,9 +90,16 @@ class SettingViews:
         if len(self.selected_values) != len(set(self.selected_values)):
             self.error_popup.show_error("E001")  # エラーコードを指定してポップアップを表示
             return
-        #self.send_sirial()
-        self.callback(self.selected_values)
+        
+       # self.send_sirial()
+        #self.callback(self.selected_values)
         print(f"選択されたストッカー: {self.selected_values}")  # 保存した値を表示
+            
+        for i in range(0,3):
+           self.stocker_data_buf[i] = self.selected_values[i]
+        print(self.selected_values)
+        print(self.stocker_data_buf)
+        self.stocker_data_buf[3].set(1)    
 
     def close_setting_view(self):        
         self.master.destroy() 
