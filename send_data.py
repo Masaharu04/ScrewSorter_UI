@@ -108,7 +108,6 @@ class SendMotorManualOperation(SendDataBaseClass):
         address_send = self.make_address(MY_ADDR,INPUT_ADDR)
         data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,DATA_OFF)
         send_data_queue.put(data_to_send)
-        print("send_input_manual_stop")
     def send_discrimination_manual_start(self):
         address_send = self.make_address(MY_ADDR,DISCRIMINATION_ADDR)
         data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,DATA_ON)
@@ -168,4 +167,22 @@ class SendSolenoidIndividualOperation(SendDataBaseClass):
     def operate_solenoid_c_in_alignment(self):
         address_send = self.make_address(MY_ADDR,ALIGNMENT_ADDR)
         data_to_send = self.make_send_data(address_send,SOLENOIDINDIVIDUALOPERATION,SOLENOID_C_IN_ALIGNMENT_ID)
+        send_data_queue.put(data_to_send)
+
+
+class SendSMoterLebel(SendDataBaseClass):
+    def __init__(self,moter_lebel):
+        self.moter_lebel = moter_lebel
+        super().__init__()
+    def send_motor_lebel1(self):
+        address_send = self.make_address(MY_ADDR,INPUT_ADDR)
+        data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,SHUTTER_SOLENOID_IN_INPUT_ID,self.moter_lebel)
+        send_data_queue.put(data_to_send)
+    def send_motor_lebel2(self):
+        address_send = self.make_address(MY_ADDR,INPUT_ADDR)
+        data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,SHUTTER_SOLENOID_IN_INPUT_ID,self.moter_lebel)
+        send_data_queue.put(data_to_send)
+    def send_motor_lebel3(self):
+        address_send = self.make_address(MY_ADDR,INPUT_ADDR)
+        data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,SHUTTER_SOLENOID_IN_INPUT_ID,self.moter_lebel)
         send_data_queue.put(data_to_send)

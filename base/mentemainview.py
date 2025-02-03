@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from base.menteviews import MaintenanceView
 from base.mentesorenoido import SorenoidMenteView
-from send_data import SendMotorManualOperation , SendMotorReset
+from send_data import SendMotorManualOperation , SendMotorReset, SendSMoterLebel
 class MaintenanceMainView:
     def __init__(self, master, on_close, motervalue):
         self.master = master
@@ -10,7 +10,7 @@ class MaintenanceMainView:
 
         self.send_motormanual_operation = SendMotorManualOperation()
         self.send_motor_reset = SendMotorReset()
-        
+        self.send_moter_lebel = SendSMoterLebel(self.send_moter_lebel)
         # カスタムカラーの定義
         self.colors = {
             "background": "#1E1E1E",    # ダークモード背景
@@ -272,7 +272,6 @@ class MaintenanceMainView:
         SorenoidMenteView(sorenoid_view, self.on_setting_close)
 
     def on_setting_close(self):       
-        # self.master.deiconify()
         self.master.destroy()
 
     def manual_stop(self):
@@ -281,13 +280,15 @@ class MaintenanceMainView:
     def send_moter_value1(self):
         value_label = self.value_label_0.cget("text")  # 正しい属性名を使用
         print("value_label:", value_label)
+        self.send_moter_lebel.send_motor_lebel1(self.value_label)
 
     def send_moter_value2(self):
         value_label = self.value_label_1.cget("text")  # 正しい属性名を使用
         print("value_label:", value_label)
+        self.send_moter_lebel.send_motor_lebel2(self.value_label)
 
     def send_moter_value3(self):
         value_label = self.value_label_2.cget("text")  # 正しい属性名を使用
         print("value_label:", value_label)
-
+        self.send_moter_lebel.send_motor_lebel3(self.value_label)
     
