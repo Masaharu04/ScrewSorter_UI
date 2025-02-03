@@ -5,7 +5,7 @@ import time
 class StockerApp:
     def __init__(self, parent):
 
-        self.stocker_values = [0.9, 0.9, 0.9]
+        self.stocker_values = [0, 0, 0]
         self.stocker_labels = [1,2,3]#ストッカーの順番
         self.value_labels = [0,0,0]
         self.circles = [0,0,0]

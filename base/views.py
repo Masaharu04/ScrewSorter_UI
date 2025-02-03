@@ -6,7 +6,7 @@ import threading
 import queue
 import time
 import datetime
-#import serial
+import serial
 from viewmodels import MainViewModel
 from base.menteviews import MaintenanceView  
 from ui.UnderButton.UnderButton import UnderButtonFrame
@@ -236,7 +236,6 @@ class MainView:
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_data_buf,self.send_rebaseInfo,self.csv_test.request_output_csv)
 
         self.update_time()
-        self.sirial_test()
         
         print("初期動作完了")
     
@@ -246,130 +245,96 @@ class MainView:
         for i in range(0,3):
             buf[i] = self.stocker_data_buf[i]
         self.stocker_frame.set_data(buf)
-        
-    def sirial_test(self):
-          photoA_low = 0
-          photoA_mid = 1
-          photoA_high = 0
-          if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
-              photoA = 0
-          elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
-              photoA = 0.3
-          elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
-              photoA = 0.6
-
-          photoB_low = 1
-          photoB_mid = 0
-          photoB_high = 0
-          if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
-              photoB = 0
-          elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
-              photoB = 0.3
-          elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
-              photoB = 0.6
-          
-          photoC_low = 0
-          photoC_mid = 0
-          photoC_high = 1
-          if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
-              photoC = 0
-          elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
-              photoC = 0.3
-          elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
-              photoC = 0.6
-
-          photo = [photoA, photoB, photoC]
-        #   起動時初期化処理
-          photo = [0, 0, 0]
-          print("起動時",photo)
-        
-          self.stocker_frame.update(photo)
           
     #シリアル通信へのリクエスト
     def check_queue(self):
-          try:
-            while True:
-              print("check_queue")
-              now = datetime.datetime.now()
-              format_now = now.strftime("%Y/%m/%d/%H/%M")
-              self.csv_test.csv_controller(format_now)
-              
-              data = self.receive_data_queue.get_nowait()
-              self.p.set_protocol(data,structsize)
-              command = data[1]
+        try:
+            now = datetime.datetime.now()
+            format_now = now.strftime("%Y/%m/%d/%H/%M")
+            self.csv_test.csv_controller(format_now)
 
-              if command == DISCRIMINATIONRESULT:
-                 self.write_discrimination_result(data[2])
+            #接続確認応答      
+            if not self.received_flags:    
+                    self.send_check_commands()#各スレーブにリクエスト送信
+                    self.received_flags = True
+                    self.wait_for_responses()
+            
+            data = self.receive_data_queue.get_nowait()
+            self.p.set_protocol(data,structsize)
+            command = data[1]
 
-              if self.errorpop_flag:
+            if command == DISCRIMINATIONRESULT:
+                    self.write_discrimination_result(data[2])
+
+            if self.errorpop_flag:
                 for addr in self.MODULE_ADDRESSES:
                     if False == self.received_module_flag[addr]:
                         self.error_popup.show_error(self.error_bandle[addr])
                 self.errorpop_flag = False
-                 
-              #接続確認応答      
-              if not self.received_flags:    
-                    self.send_check_commands()#各スレーブにリクエスト送信
-                    self.received_flags = True
-                    self.wait_for_responses()
             
             #   if command == INPUTSTOCKERSTATUS:
             #      self.stocker_capacity = self.p.inputStockerStatus.capacity
             #      self.update_amount_display(self.amount_label,self.stocker_capacity)
 
             #   el
-              if command == SENSORINFO:
+            if command == SENSORINFO:
                 data1 = decimalToBinaryList(self.p.s.SensorInfo.data1)
                 data2 = decimalToBinaryList(self.p.s.SensorInfo.data2)
                 source_address = data[0] >> 4
                 if(source_address == INPUT_ADDR):
-                  input_distance = self.p.sensorInfo.data2
+                    input_distance = self.p.sensorInfo.data2
                 elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
-                  #先端の供給されたかどうかのセンサ
-                  photoA = data1[0]
-                  photoB = data1[1]
-                  photoC = data1[2]
-                  #ストック量
-                  photoA_low = data1[3]
-                  photoA_mid = data1[4]
-                  photoA_high = data1[5]
+                    #先端の供給されたかどうかのセンサ
+                    photoA = data1[0]
+                    photoB = data1[1]
+                    photoC = data1[2]
+                    #ストック量
+                    photoA_low = data1[3]
+                    photoA_mid = data1[4]
+                    photoA_high = data1[5]
 
-                  photoB_low = data1[6]
-                  photoB_mid = data1[7]
-                  photoB_high = data2[4]
+                    photoB_low = data1[6]
+                    photoB_mid = data1[7]
+                    photoB_high = data2[4]
 
-                  photoC_low = data2[5]
-                  photoC_mid = data2[6]
-                  photoC_high = data2[7]
+                    photoC_low = data2[5]
+                    photoC_mid = data2[6]
+                    photoC_high = data2[7]
+                    
+                    if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
+                        photoA = 0.3
+                    elif photoA_low == 1 and photoA_mid == 1 and photoA_high == 0:
+                        photoA = 0.6
+                    elif photoA_low == 1 and photoA_mid == 1 and photoA_high == 1:
+                        photoA = 0.9
+                    else:
+                        photoA = 0
+
+                    if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
+                        photoB = 0.3
+                    elif photoB_low == 1 and photoB_mid == 1 and photoB_high == 0:
+                        photoB = 0.6
+                    elif photoB_low == 1 and photoB_mid == 1 and photoB_high == 1:
+                        photoB = 0.9
+                    else:
+                        photoB = 0
+
+                    if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
+                        photoC = 0.3
+                    elif photoC_low == 1 and photoC_mid == 1 and photoC_high == 0:
+                        photoC = 0.6
+                    elif photoC_low == 1 and photoC_mid == 1 and photoC_high == 1:
+                        photoC = 0.9
+                    else:
+                        photoC = 0
+
+                    photo = [photoA, photoB, photoC]
+                    self.stocker_frame.update(photo)
                 
-                  if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
-                      photoA = 0
-                  elif photoA_low == 0 and photoA_mid == 1 and photoA_high == 0:
-                      photoA = 0.3
-                  elif photoA_low == 0 and photoA_mid == 0 and photoA_high == 1:
-                      photoA = 0.6
-
-                  if photoB_low == 1 and photoB_mid == 0 and photoB_high == 0:
-                      photoB = 0
-                  elif photoB_low == 0 and photoB_mid == 1 and photoB_high == 0:
-                      photoB = 0.3
-                  elif photoB_low == 0 and photoB_mid == 0 and photoB_high == 1:
-                      photoB = 0.6
-
-                  if photoC_low == 1 and photoC_mid == 0 and photoC_high == 0:
-                      photoC = 0
-                  elif photoC_low == 0 and photoC_mid == 1 and photoC_high == 0:
-                      photoC = 0.3
-                  elif photoC_low == 0 and photoC_mid == 0 and photoC_high == 1:
-                      photoC = 0.6
-
-                  photo = [photoA, photoB, photoC]
-                  self.stocker_frame.update(photo)
-                  
-          except queue.Empty:
-              pass
-          finally:
-              self.master.after(100, self.check_queue)
+        except queue.Empty:
+            pass
+        finally:
+            self.master.after(100, self.check_queue)
               
     def send_check_commands(self):
         """ 各モジュールに接続確認コマンドを送信 """
@@ -437,7 +402,6 @@ class MainView:
             print(f"エラー: 接続確認ができなかったモジュール {', '.join(hex(addr) for addr in missing_addresses)}")
             self.errorpop_flag = True
             
-
         # self.response_received = True  # 応答を受信したことを記録
         return False
    
