@@ -233,7 +233,7 @@ class MainView:
         self.stocker_data_buf[3].trace_add("write", self.stocker_callback)
 
         # 下部フレーム（ボタン）
-        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_data_buf,self.send_input_start,self.send_input_stop,self.csv_test.request_output_csv)
+        self.under_button = UnderButtonFrame(main_frame, self, self.stocker_data_buf,self.send_rebaseInfo,self.csv_test.request_output_csv)
 
         self.update_time()
         self.sirial_test()
@@ -289,10 +289,10 @@ class MainView:
     def check_queue(self):
           try:
             while True:
+              print("check_queue")
               now = datetime.datetime.now()
               format_now = now.strftime("%Y/%m/%d/%H/%M")
               self.csv_test.csv_controller(format_now)
-            
               
               data = self.receive_data_queue.get_nowait()
               self.p.set_protocol(data,structsize)
@@ -307,53 +307,15 @@ class MainView:
                         self.error_popup.show_error(self.error_bandle[addr])
                 self.errorpop_flag = False
                  
-              #接続確認      
+              #接続確認応答      
               if not self.received_flags:    
-               #if not self.received_flags[addr]:
                     self.send_check_commands()#各スレーブにリクエスト送信
                     self.received_flags = True
                     self.wait_for_responses()
-
-              if command == CONNECTCHECKRESPONSE:
-                source_address = data[0] >> 4
-                if(source_address == INPUT_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == DISCRIMINATION_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == RETURN_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == ALIGNMENT_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == MASTER_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == OUTPUT_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
-
-                if(source_address == IMAGE_ADDR):
-                    print("投入部接続完了")
-                else:
-                   print("接続確認ができませんでした")
             
             #   if command == INPUTSTOCKERSTATUS:
-            #     self.stocker_capacity = self.p.inputStockerStatus.capacity
-            #     self.update_amount_display(self.amount_label,self.stocker_capacity)
+            #      self.stocker_capacity = self.p.inputStockerStatus.capacity
+            #      self.update_amount_display(self.amount_label,self.stocker_capacity)
 
             #   el
               if command == SENSORINFO:
@@ -374,11 +336,11 @@ class MainView:
 
                   photoB_low = data1[6]
                   photoB_mid = data1[7]
-                  photoB_high = data2[0]
+                  photoB_high = data2[4]
 
-                  photoC_low = data2[1]
-                  photoC_mid = data2[2]
-                  photoC_high = data2[3]
+                  photoC_low = data2[5]
+                  photoC_mid = data2[6]
+                  photoC_high = data2[7]
                 
                   if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
                       photoA = 0
@@ -441,12 +403,13 @@ class MainView:
             csv_data = [format_now, -1, -1]
             print(csv_data)
             self.csv_test.add_a_line_of_csv_data(DISCRIMINATION_RESULTS_FILE_PATH, csv_data) 
-            
+
+        
     def wait_for_responses(self, timeout=5):
         """ 応答を5秒間待機し、接続確認を行う """
         start_time = time.time()
         received_addresses = set()
-
+        
         while time.time() - start_time < timeout:
             try:
                 # 受信データを取得（最大0.5秒待つ）
@@ -464,7 +427,6 @@ class MainView:
                     print("全モジュール接続確認完了")
                     # self.response_received = True  # 応答を受信したことを記録
                     return True
-
 
             except queue.Empty:
                 continue  # タイムアウトまで待機
@@ -515,9 +477,6 @@ class MainView:
         address_send = make_address(MY_ADDR,INPUT_ADDR);
         data_to_send = make_send_data(address_send,command);
         # self.send_data_queue.put(data_to_send)#エラーコマンドリクエスト
-        
-    
-        
 
   #シリアル通信送信コマンド
     def send_rebaseInfo(self):
@@ -527,69 +486,6 @@ class MainView:
             data_to_send = make_send_data(address_send, command)
             self.send_data_queue.put(data_to_send)
         print("排出ボタンが押されました")
-
-    def send_input_start(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,INPUT_ADDR);
-        data_to_send = make_send_data(address_send,command,0x01);
-        self.send_data_queue.put(data_to_send)
-        print("投入スタートボタンが押されました。")
-
-    def send_input_stop(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,INPUT_ADDR);
-        data_to_send = make_send_data(address_send,command,0x00);
-        self.send_data_queue.put(data_to_send)
-        print("投入ストップボタンが押されました。")
-
-    def send_discrimination_start(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
-        data_to_send = make_send_data(address_send,command,0x01);
-        self.send_data_queue.put(data_to_send)
-        print("判別スタートボタンが押されました。")
-    
-    def send_discrimination_stop(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,DISCRIMINATION_ADDR);
-        data_to_send = make_send_data(address_send,command,0x00);
-        self.send_data_queue.put(data_to_send)
-        print("判別ストップボタンが押されました。")
-
-    def send_alignment_start(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,RETURN_ADDR);
-        data_to_send = make_send_data(address_send,command,0x01);
-        self.send_data_queue.put(data_to_send)
-        print("整列スタートボタンが押されました。")
-
-    def send_alignment_stop(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,RETURN_ADDR);
-        data_to_send = make_send_data(address_send,command,0x00);
-        self.send_data_queue.put(data_to_send)
-        print("整列ストップボタンが押されました。")
-
-    def send_reabse_start(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
-        data_to_send = make_send_data(address_send,command,0x01);
-        self.send_data_queue.put(data_to_send)
-        print("返却スタートボタンが押されました。")
-
-    def send_rebase_stop(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,ALIGNMENT_ADDR);
-        data_to_send = make_send_data(address_send,command,0x00);
-        self.send_data_queue.put(data_to_send)
-        print("返却ストップボタンが押されました。")
-
-    def mastr_stop(self):
-        command = MODULEOPERATION
-        address_send = make_address(MY_ADDR,MASTER_ADDR);
-        data_to_send = make_send_data(address_send,command,0x00);
-        self.send_data_queue.put(data_to_send)
-        print("全ストップボタンが押されました。")
             
     def send_stocker(self,selected_values):
         print(selected_values)
@@ -614,4 +510,3 @@ def start_main_view():
     main_view = MainView(root)
     root.mainloop()
     
-

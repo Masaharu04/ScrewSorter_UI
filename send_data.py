@@ -108,6 +108,7 @@ class SendMotorManualOperation(SendDataBaseClass):
         address_send = self.make_address(MY_ADDR,INPUT_ADDR)
         data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,DATA_OFF)
         send_data_queue.put(data_to_send)
+        print("send_input_manual_stop")
     def send_discrimination_manual_start(self):
         address_send = self.make_address(MY_ADDR,DISCRIMINATION_ADDR)
         data_to_send = self.make_send_data(address_send,MOTORMANUALOPERATION,DATA_ON)

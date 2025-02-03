@@ -9,9 +9,10 @@ from base.menteviews import MaintenanceView
 from base.mentemainview import MaintenanceMainView
 from ParamManager.ParamManager import ParamManager 
 from base.timesettingview import TimeSettingView
+from send_data import SendModuleOperation
 
 class UnderButtonFrame:
-    def __init__(self, master, main_view, stocker_data_buf,send_input_start,send_input_stop,request_output_csv):
+    def __init__(self, master, main_view, stocker_data_buf,send_rebaseInfo,request_output_csv):
         self.master = master
         self.main_view = main_view
         self.button_enabled = {}  # 各ボタンの有効/無効状態を管理
@@ -19,9 +20,9 @@ class UnderButtonFrame:
         self.setup_buttons()
         self.stocker_data_buf = stocker_data_buf
         
-        self.send_input_start = send_input_start
-        self.send_input_stop = send_input_stop
+        self.send_rebaseInfo = send_rebaseInfo
         self.request_output_csv = request_output_csv
+        self.send_module_operation = SendModuleOperation()
 
         self.motervalue = [4,6,4]
 
@@ -56,6 +57,9 @@ class UnderButtonFrame:
 
         self.create_buttons()
 
+    def export_button_action(self):
+        self.request_output_csv()
+        print("エクスポート")
 
     def callback_test(self,data):
         print("data...........................")
@@ -132,16 +136,14 @@ class UnderButtonFrame:
 
     def open_shutdown_confirmation(self):
         # シャットダウン確認ポップアップを表示
-        
         self.shutdown_popup.shutdown_button_action()  # インスタンスメソッドを呼び出す
 
     def print_operation(self):
         print("一連動作ボタンが押されました")  # 一連動作ボタンが押されたときの処理
 
     def discharge_operation(self):
-        from base.views import MainView 
-        self.main_view.send_rebaseInfo()  # MainViewのsend_rebaseInfoを呼び出す
       # 排出ボタンが押されたときの処理
+       self.send_rebaseInfo()
 
     def open_maintenance_view(self):
         # メンテナンス画面を開く

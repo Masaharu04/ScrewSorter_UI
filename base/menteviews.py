@@ -44,6 +44,16 @@ class MaintenanceView:
         self._discrimination_section(sections_frame, "判別", 1, 2)
         self._alignment_section(sections_frame, "整列", 1, 3)
         self._rebase_section(sections_frame, "返却", 1, 4)
+        self._back_section(sections_frame, "戻る", 1, 5)
+
+    def _back_section(self, parent, title, row, col):
+        section_frame = ctk.CTkFrame(parent)
+        section_frame.grid(row=row, column=col, padx=10, pady=10, sticky='nsew')
+
+        # 運転ボタン
+        start_button = ctk.CTkButton(section_frame, text="戻る", font=("Meiryo", 35, "bold"), command=lambda t=title: self.close_maintenance_view(), width=20, height=280)
+        start_button.pack(pady=(0, 0))
+
 
     def _input_section(self, parent, title, row, col):
         # 各セクションの作成
@@ -55,11 +65,11 @@ class MaintenanceView:
         title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転", font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_start(), width=160, height=110)
+        start_button = ctk.CTkButton(section_frame, text="運転", font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_start(), width=150, height=110)
         start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_stop(),fg_color="red", width=160, height=110)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.input_stop(),fg_color="red", width=150, height=110)
         stop_button.pack()
     def _discrimination_section(self, parent, title, row, col):
         # 各セクションの作成
@@ -71,11 +81,11 @@ class MaintenanceView:
         title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_start(), width=160, height=110)
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_start(), width=150, height=110)
         start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_stop(),fg_color="red", width=160, height=110)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.discrimination_stop(),fg_color="red", width=150, height=110)
         stop_button.pack()
     def _alignment_section(self, parent, title, row, col):
         # 各セクションの作成
@@ -87,11 +97,11 @@ class MaintenanceView:
         title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_start(), width=160, height=110)
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_start(), width=150, height=110)
         start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_stop(),fg_color="red", width=160, height=110)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.alignment_stop(),fg_color="red", width=150, height=110)
         stop_button.pack()
     def _rebase_section(self, parent, title, row, col):
         # 各セクションの作成
@@ -103,11 +113,11 @@ class MaintenanceView:
         title_label.pack(pady=(5, 5))
 
         # 運転ボタン
-        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_start(), width=160, height=110)
+        start_button = ctk.CTkButton(section_frame, text="運転",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_start(), width=150, height=110)
         start_button.pack(pady=(0, 15))
         
         # 停止ボタン
-        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_stop(), fg_color="red", width=160, height=110)
+        stop_button = ctk.CTkButton(section_frame, text="停止",font=("Meiryo", 35, "bold"), command=lambda t=title: self.rebase_stop(), fg_color="red", width=150, height=110)
         stop_button.pack()
 
     def _create_buttons(self, parent):
@@ -115,12 +125,9 @@ class MaintenanceView:
         buttons_frame = ctk.CTkFrame(parent)
         buttons_frame.pack(fill='x', pady=5)
 
-        # 戻るボタン
-        close_button = ctk.CTkButton(buttons_frame, text="戻る", command=self.close_maintenance_view, font=("Meiryo", 20, "bold"),width=200, height=70)
-        close_button.pack(side='left', padx=(10, 10),pady=(10, 10))
 
         # 全停止ボタン
-        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.master_stop, font=("Meiryo", 20, "bold"), fg_color="red", width=200, height=70)
+        stop_button = ctk.CTkButton(buttons_frame, text="全停止", command=self.master_stop, font=("Meiryo", 20, "bold"), fg_color="red", width=780, height=70)
         stop_button.pack(side='left', padx=(0, 10),pady=(10, 10))
 
 
@@ -128,54 +135,43 @@ class MaintenanceView:
         print("全停止します")
 
     def close_maintenance_view(self):
-        self.master.destroy()
         self.on_close()
+        self.master.destroy()
 
     def input_start(self):
         self.send_module_operation.send_input_module_start()
-        # from src.base.views import MainView 
-        # main_view = MainView(self.master)
-        # main_view.send_input_start()
+        print("send_input_module_start")
+
         
     def input_stop(self):
-        self.send_input_stop()
-        # from src.base.views import MainView 
-        # main_view = MainView(self.master)
-        # main_view.send_input_stop()
+        self.send_module_operation.send_input_module_stop()
+        print("send_input_module_stop")
 
     def discrimination_start(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+       self.send_module_operation.send_discrimination_module_start()
+       print("send_discrimination_module_start")
 
     def discrimination_stop(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_stop()
+        self.send_module_operation.send_discrimination_module_stop()
+        print("send_discrimination_module_stop")
 
     def alignment_start(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+        self.send_module_operation.send_return_module_start()
+        print("send_return_module_start")
 
     def alignment_stop(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_stop()
+        self.send_module_operation.send_return_module_stop()
+        print("send_return_module_stop")
 
     def rebase_start(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_start()
+        self.send_module_operation.send_alignment_module_start()
+        print("send_alignment_module_start")
 
     def rebase_stop(self):
-        from src.base.views import MainView 
-        main_view = MainView(self.master)
-        main_view.send_discrimination_stop()
+        self.send_module_operation.send_alignment_module_stop()
+        print("send_alignment_module_stop")
 
     def master_stop(self):
-        from src.base.views import MainView
-        main_view = MainView(self.master)
-        main_view.mastr_stop()
-
+        self.send_module_operation.send_all_module_stop()
+        print("send_all_module_stop")
         
