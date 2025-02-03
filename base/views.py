@@ -6,7 +6,7 @@ import threading
 import queue
 import time
 import datetime
-import serial
+#import serial
 from viewmodels import MainViewModel
 from base.menteviews import MaintenanceView  
 from ui.UnderButton.UnderButton import UnderButtonFrame
@@ -64,11 +64,11 @@ class SerialThread:
     self.send_data_queue = send_data_queue
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
-    try:
-     self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    except serial.SerialException as e:
-     print(f"シリアルポートの初期化に失敗しました: {e}")
-     self.ser = None
+    #try:
+    #  self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    #except serial.SerialException as e:
+    #  print(f"シリアルポートの初期化に失敗しました: {e}")
+    #  self.ser = None
 
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -122,7 +122,7 @@ class SerialThread:
           data_to_send = self.send_data_queue.get_nowait()
           print("//////////send//////////")
           print(data_to_send)
-          self.ser.write(data_to_send)
+          #self.ser.write(data_to_send)
           
       except queue.Empty:
           pass
@@ -283,23 +283,23 @@ class MainView:
                 source_address = data[0] >> 4
                 if(source_address == INPUT_ADDR):
                     input_distance = self.p.sensorInfo.data2
-                elif(source_address == MASTER_ADDR):#test用にmasterにしてる本来はALIGNMENT_ADDR
+                elif(source_address == ALIGNMENTUNITADDRESS):#test用にmasterにしてる本来はALIGNMENT_ADDR
                     #先端の供給されたかどうかのセンサ
                     photoA = data1[0]
                     photoB = data1[1]
                     photoC = data1[2]
                     #ストック量
-                    photoA_low = data1[3]
+                    photoA_high = data1[3]
                     photoA_mid = data1[4]
-                    photoA_high = data1[5]
+                    photoA_low = data1[5]
 
-                    photoB_low = data1[6]
+                    photoB_high = data1[6]
                     photoB_mid = data1[7]
-                    photoB_high = data2[4]
+                    photoB_low = data2[4]
 
-                    photoC_low = data2[5]
+                    photoC_high = data2[5]
                     photoC_mid = data2[6]
-                    photoC_high = data2[7]
+                    photoC_low = data2[7]
                     
                     if photoA_low == 1 and photoA_mid == 0 and photoA_high == 0:
                         photoA = 0.3

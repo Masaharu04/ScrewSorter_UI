@@ -4,15 +4,16 @@ from datetime import datetime
 #from Rtc import RtcControl
 
 class TimeSettingView:
-    def __init__(self, master, on_close):
+    def __init__(self, master):
         self.master = master
-        self.on_close = on_close
+       
         self.setup_ui()
 
     def setup_ui(self):
         self._setup_window()
         main_frame = self._create_main_frame()
         self._create_time_setting_widgets(main_frame)
+        self.rtc_control = RtcControl()
         self._create_buttons(main_frame)
 
     def _setup_window(self):
@@ -74,7 +75,7 @@ class TimeSettingView:
         
         print(f"設定されたRTC時刻: {self.year.get()}/{self.month.get()}/{self.day.get()} {self.hour.get()}:{self.minute.get()}")
         # RTC 設定用のコードをここに追加
-        self.rtc_control.set_date(f"{self.year.get()}/{self.month.get()}/{self.day.get()}/{self.hour.get()}/{self.minute.get()}")
+        #self.rtc_control.set_date(f"{self.year.get()}/{self.month.get()}/{self.day.get()}/{self.hour.get()}/{self.minute.get()}")
         self.master.destroy()
 
     def _create_buttons(self, parent):

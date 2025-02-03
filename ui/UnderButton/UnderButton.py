@@ -162,7 +162,7 @@ class UnderButtonFrame:
 
     def open_timesetting_view(self):
         timeSetting_window = ctk.CTkToplevel(self.master)
-        TimeSettingView(timeSetting_window, self.on_setting_close)
+        TimeSettingView(timeSetting_window)
 
     def on_setting_close(self):       
         # self.master.deiconify()
