@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from datetime import datetime
+
 #from Rtc import RtcControl
 
 class TimeSettingView:
@@ -73,7 +74,7 @@ class TimeSettingView:
         
         print(f"設定されたRTC時刻: {self.year.get()}/{self.month.get()}/{self.day.get()} {self.hour.get()}:{self.minute.get()}")
         # RTC 設定用のコードをここに追加
-        # self.rtc_control.set_date(f"{self.year.get()}/{self.month.get()}/{self.day.get()}/{self.hour.get()}/{self.minute.get()}")
+        self.rtc_control.set_date(f"{self.year.get()}/{self.month.get()}/{self.day.get()}/{self.hour.get()}/{self.minute.get()}")
         self.master.destroy()
 
     def _create_buttons(self, parent):
@@ -83,8 +84,3 @@ class TimeSettingView:
         save_button = ctk.CTkButton(button_frame, text="設定を保存", command=self.save_settings, height=80, width=300, font=("Arial", 24))
         save_button.pack(side='left', padx=20)
         
-        # return_button = ctk.CTkButton(button_frame, text="戻る", command=self.timesetting_close, height=80, width=300, font=("Arial", 24))
-        # return_button.pack(side='right', padx=20)
-
-    def timesetting_close(self):        
-        self.master.destroy()

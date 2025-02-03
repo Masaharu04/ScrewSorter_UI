@@ -64,11 +64,11 @@ class SerialThread:
     self.send_data_queue = send_data_queue
 
     self.serial_test_data = ([0x15,0x0b,0x50],[0x15,0x0b,0x30])
-    #try:
-    #  self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
-    #except serial.SerialException as e:
-    #  print(f"シリアルポートの初期化に失敗しました: {e}")
-    #  self.ser = None
+    try:
+     self.ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    except serial.SerialException as e:
+     print(f"シリアルポートの初期化に失敗しました: {e}")
+     self.ser = None
 
     # 処理スレッドの開始
     self.thread = threading.Thread(target=self.SerialProcess)
@@ -122,7 +122,7 @@ class SerialThread:
           data_to_send = self.send_data_queue.get_nowait()
           print("//////////send//////////")
           print(data_to_send)
-          #self.ser.write(data_to_send)
+          self.ser.write(data_to_send)
           
       except queue.Empty:
           pass
