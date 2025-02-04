@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from base.menteviews import MaintenanceView
 from base.mentesorenoido import SorenoidMenteView
-from send_data import SendMotorManualOperation , SendMotorReset, SendSMoterLebel
+from send_data import SendMotorManualOperation , SendMotorReset, SendConfigurationChange
 class MaintenanceMainView:
     def __init__(self, master, on_close, motervalue):
         self.master = master
@@ -10,7 +10,7 @@ class MaintenanceMainView:
 
         self.send_motormanual_operation = SendMotorManualOperation()
         self.send_motor_reset = SendMotorReset()
-        self.send_moter_lebel = SendSMoterLebel(self.send_moter_lebel)
+        self.send_configuration_change = SendConfigurationChange()
         # カスタムカラーの定義
         self.colors = {
             "background": "#1E1E1E",    # ダークモード背景
@@ -277,18 +277,17 @@ class MaintenanceMainView:
     def manual_stop(self):
         self.send_motormanual_operation.send_input_manual_stop()
 
+    #投入部の設定
     def send_moter_value1(self):
-        value_label = self.value_label_0.cget("text")  # 正しい属性名を使用
-        print("value_label:", value_label)
-        self.send_moter_lebel.send_motor_lebel1(self.value_label)
+        value_label1 = self.value_label_0.cget("text")  # 正しい属性名を使用
+        print("value_label:", value_label1)
+        value_label2 = self.value_label_1.cget("text")  # 正しい属性名を使用
+        print("value_label:", value_label2)
+        self.send_configuration_change.change_input_configuration(int(value_label1), int(value_label2))
 
-    def send_moter_value2(self):
-        value_label = self.value_label_1.cget("text")  # 正しい属性名を使用
-        print("value_label:", value_label)
-        self.send_moter_lebel.send_motor_lebel2(self.value_label)
 
+    #判別部の設定
     def send_moter_value3(self):
         value_label = self.value_label_2.cget("text")  # 正しい属性名を使用
         print("value_label:", value_label)
-        self.send_moter_lebel.send_motor_lebel3(self.value_label)
-    
+        self.send_configuration_change.change_discrimination_configuration(int(value_label))

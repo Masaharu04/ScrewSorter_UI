@@ -235,7 +235,7 @@ class MainView:
         # 下部フレーム（ボタン）
         self.under_button = UnderButtonFrame(main_frame, self, self.stocker_data_buf,self.send_rebaseInfo,self.csv_test.request_output_csv)
 
-        self.update_time()
+       
         
         print("初期動作完了")
     
@@ -252,6 +252,7 @@ class MainView:
             now = datetime.datetime.now()
             format_now = now.strftime("%Y/%m/%d/%H/%M")
             self.csv_test.csv_controller(format_now)
+            self.update_time()
 
             #接続確認応答      
             if not self.received_flags:    

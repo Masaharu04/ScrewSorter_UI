@@ -8,4 +8,4 @@ def update_time(time_label, date_label):
     time_label.configure(text=f"{current_time}")
     date_label.configure(text=f"{current_date}")
     # 1秒ごとにこの関数を再呼び出しするための設定
-    time_label.master.after(1000, update_time, time_label, date_label)  # time_label.masterを使用して再帰的に呼び出す
+    # time_label.master.after(1000, update_time, time_label, date_label)  # time_label.masterを使用して再帰的に呼び出す
